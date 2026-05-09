@@ -15,10 +15,17 @@
   --text:#eeeef5;--muted:#5a5a6a;--muted2:#8a8a9a;
   --accent:#6c63f5;--accent-glow:rgba(108,99,245,.15);
   --green:#3ecf8e;--red:#f56c6c;--gold:#f5c842;--orange:#f5906c;
-  --sidebar:220px;
+  --sidebar:200px;
   --food:#f5906c;--rent:#6c63f5;--emi:#f5c842;--shop:#f56c6c;
   --travel:#63f5e8;--fuel:#a0a0c0;--util:#63a8f5;--gift:#f563c8;
   --invest:#3ecf8e;--misc:#8a8aaa;
+}
+[data-theme="light"]{
+  --bg:#f5f5f7;--s1:#ffffff;--s2:#f0f0f5;--s3:#e8e8f0;
+  --border:#dddde8;--border2:#cacad8;
+  --text:#111116;--muted:#888899;--muted2:#666677;
+  --accent:#6c63f5;--accent-glow:rgba(108,99,245,.12);
+  --green:#2eb878;--red:#e55555;--gold:#c49a00;--orange:#d06848;
 }
 
 html{height:100%;background:var(--bg);overflow-x:hidden}body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100%;min-height:-webkit-fill-available;width:100%;max-width:100vw}
@@ -32,7 +39,7 @@ html{height:100%;background:var(--bg);overflow-x:hidden}body{font-family:'DM Mon
   background:var(--s1);border-right:1px solid var(--border);
   display:flex;flex-direction:column;
   position:fixed;top:0;left:0;height:100vh;z-index:30;
-  padding:1.5rem 0;
+  padding:1.25rem 0;
 }
 .sidebar-logo{padding:0 1.4rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
 .sidebar-logo h1{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;line-height:1.2}
@@ -52,7 +59,7 @@ html{height:100%;background:var(--bg);overflow-x:hidden}body{font-family:'DM Mon
 
 /* MAIN CONTENT */
 .main{flex:1;margin-left:var(--sidebar);min-height:100vh;display:flex;flex-direction:column;background:var(--bg)}
-.content-wrap{width:100%;max-width:1100px;margin:0 auto;display:flex;flex-direction:column;flex:1;min-height:0}
+.content-wrap{width:100%;display:flex;flex-direction:column;flex:1;min-height:0}
 
 /* MOBILE NAV (bottom) */
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);z-index:30;padding:.5rem 0 env(safe-area-inset-bottom,.6rem)}
@@ -164,7 +171,7 @@ select option{background:#18181f}
 .bs-item.left .bs-val{color:var(--gold)}
 
 /* DESKTOP STATS BAR */
-.desktop-stats{display:none;padding:.8rem 1.5rem;border-bottom:1px solid var(--border);display:none;gap:0;flex-shrink:0}
+.desktop-stats{display:none;padding:.8rem 1.5rem;border-bottom:1px solid var(--border);gap:0;flex-shrink:0}
 .ds-item{flex:1;text-align:center;padding:.5rem}
 .ds-item+.ds-item{border-left:1px solid var(--border)}
 .ds-val{font-size:1.1rem;font-weight:800;font-family:'Syne',sans-serif}
@@ -263,6 +270,9 @@ select option{background:#18181f}
 
 /* EMPTY */
 .empty{text-align:center;padding:3rem 1.5rem;color:var(--muted)}
+.theme-btn{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:.55rem .8rem;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;text-align:left;margin-bottom:.5rem;transition:all .15s}
+.theme-btn:hover{color:var(--text);border-color:var(--border2)}
+.theme-btn-mobile{background:var(--s2);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:.4rem .7rem;font-size:.9rem;cursor:pointer;flex-shrink:0}
 .empty .emoji{font-size:2.5rem;margin-bottom:.75rem}
 .empty p{font-size:.8rem;line-height:1.8}
 
@@ -301,38 +311,17 @@ select option{background:#18181f}
   .entries-table{display:table}
   .entries-cards{display:none}
   .add-section{padding:1rem 1.5rem}
+  .add-grid.wide{grid-template-columns:1fr 1fr 1fr 1fr 1fr}
   .cats{padding:.5rem 1.5rem}
   .month-tabs{padding:.55rem 1.5rem}
   .search-wrap{padding:.5rem 1.5rem}
   .entries-header{padding:.5rem 1.5rem .3rem}
   .sum-grid{grid-template-columns:repeat(4,1fr)}
   .budget-grid{grid-template-columns:repeat(3,1fr)}
-}
-@media(min-width:1100px){
-  .page-header,.desktop-stats,.month-row,.cats,.add-section,.search-wrap,.entries-header{
-    max-width:1080px;margin-left:auto;margin-right:auto;box-sizing:border-box;
-  }
-  .entries-wrap .entries-table,.entries-wrap .entries-cards{
-    max-width:1080px;margin:0 auto;display:block;width:100%;
-  }
-  .entries-table{max-width:1080px;margin:0 auto}
-  .sum-content,.budget-content,.setup-content{max-width:1080px;margin:0 auto}
+  .page-header h2{font-size:1.4rem}
 }
 
-@media(min-width:1280px){
-  .main{max-width:calc(100vw - var(--sidebar))}
-  .page-header{padding:1.4rem 2.5rem 1rem}
-  .desktop-stats{padding:.9rem 2.5rem}
-  .month-row .month-tabs{padding:.55rem 2.5rem}
-  .export-btn{margin-right:1.5rem}
-  .cats{padding:.5rem 2.5rem}
-  .add-section{padding:1.1rem 2.5rem}
-  .search-wrap{padding:.5rem 2.5rem}
-  .entries-header{padding:.5rem 2.5rem .3rem}
-  .entries-table th:first-child,.entries-table td:first-child{padding-left:2.5rem}
-  .entries-table th:last-child,.entries-table td:last-child{padding-right:2.5rem}
-  .sum-content,.budget-content,.setup-content{padding:1.4rem 2.5rem;max-width:100%}
-}
+
 
 </style>
 </head>
@@ -358,11 +347,26 @@ select option{background:#18181f}
       <div><div class="field-lbl">Date</div><input class="field-input" type="date" id="editDate"></div>
       <div><div class="field-lbl">Category</div>
         <select class="field-select" id="editCat">
-          <option value="Food">🍽 Food</option><option value="Rent">🏠 Rent</option>
-          <option value="EMI">🚗 EMI</option><option value="Shopping">🛍 Shopping</option>
-          <option value="Travel">✈ Travel</option><option value="Fuel">⛽ Fuel</option>
-          <option value="Utilities">💡 Utilities</option><option value="Gift">🎁 Gift</option>
-          <option value="Investment">📈 Investment</option><option value="Misc">📦 Misc</option>
+          <optgroup label="Daily">
+          <option value="Food">🍽 Food</option>
+          <option value="Groceries">🛒 Groceries</option>
+          <option value="Medical">🏥 Medical</option>
+          <option value="Entertainment">🎬 Entertainment</option>
+          <option value="Personal">💆 Personal</option>
+          </optgroup>
+          <optgroup label="Fixed">
+          <option value="Rent">🏠 Rent</option>
+          <option value="EMI">🚗 EMI</option>
+          <option value="Investment">📈 Investment</option>
+          </optgroup>
+          <optgroup label="Variable">
+          <option value="Shopping">🛍 Shopping</option>
+          <option value="Travel">✈ Travel</option>
+          <option value="Fuel">⛽ Fuel</option>
+          <option value="Utilities">💡 Utilities</option>
+          <option value="Gift">🎁 Gift</option>
+          <option value="Misc">📦 Misc</option>
+          </optgroup>
         </select>
       </div>
       <div><div class="field-lbl">Payment Source</div>
@@ -416,6 +420,7 @@ select option{background:#18181f}
       </div>
     </nav>
     <div class="sidebar-bottom">
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙 Dark Mode</button>
       <div class="sync-status">
         <div class="sync-dot" id="syncDot"></div>
         <span id="syncLabel">Not connected</span>
@@ -434,9 +439,12 @@ select option{background:#18181f}
           <h2 id="topMonth">—</h2>
           <p id="topDate">—</p>
         </div>
-        <div class="header-right">
-          <div class="amt" id="topTotal">₹0</div>
-          <div class="lbl">this month</div>
+        <div class="header-right" style="display:flex;align-items:center;gap:.75rem">
+          <button onclick="refreshFromSheet()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:.3rem .6rem;font-size:.7rem;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600" title="Refresh from Google Sheets">↻ Refresh</button>
+          <div>
+            <div class="amt" id="topTotal">₹0</div>
+            <div class="lbl">this month</div>
+          </div>
         </div>
       </div>
 
@@ -456,6 +464,10 @@ select option{background:#18181f}
       <div class="cats" id="catFilter">
         <div class="cat-pill active" data-cat="All">All</div>
         <div class="cat-pill" data-cat="Food">🍽 Food</div>
+        <div class="cat-pill" data-cat="Groceries">🛒 Groceries</div>
+        <div class="cat-pill" data-cat="Medical">🏥 Medical</div>
+        <div class="cat-pill" data-cat="Entertainment">🎬 Entertainment</div>
+        <div class="cat-pill" data-cat="Personal">💆 Personal</div>
         <div class="cat-pill" data-cat="Rent">🏠 Rent</div>
         <div class="cat-pill" data-cat="EMI">🚗 EMI</div>
         <div class="cat-pill" data-cat="Shopping">🛍 Shopping</div>
@@ -580,6 +592,7 @@ select option{background:#18181f}
     <div class="page" id="setupPage">
       <div class="page-header">
         <div><h2>Setup & Sync</h2><p>Connect your Google Sheet</p></div>
+        <button class="theme-btn-mobile" onclick="toggleTheme()" id="themeBtnMobile">🌙</button>
       </div>
       <div class="setup-content">
         <div class="setup-card">
@@ -635,6 +648,17 @@ select option{background:#18181f}
             </div>
             <button class="disconnect-btn" onclick="disconnectSheet()">Disconnect</button>
           </div>
+
+          <div id="connDiag" style="display:none;margin-top:1rem;background:rgba(245,108,108,.08);border:1px solid var(--red);border-radius:9px;padding:1rem">
+            <div style="font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;color:var(--red);margin-bottom:.6rem">Connection failed – check these:</div>
+            <div style="font-size:.68rem;color:var(--muted);line-height:2">
+              ✦ Apps Script deployed as <b style="color:var(--text)">Web App</b> (not library)?<br>
+              ✦ "Who has access" set to <b style="color:var(--text)">Anyone</b>?<br>
+              ✦ Did you click <b style="color:var(--text)">New version</b> when redeploying?<br>
+              ✦ URL ends with <b style="color:var(--text)">/exec</b> (not /dev)?<br>
+              ✦ Try opening the URL directly in a new browser tab – should show JSON
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -665,9 +689,9 @@ select option{background:#18181f}
 // ── CONSTANTS ──
 const INCOME = 250000;
 const CC_SOURCES = ['HDFC Regalia CC','ICICI Amazon CC','HDFC Swiggy CC','Axis Airtel CC'];
-const CATS = ['Food','Rent','EMI','Shopping','Travel','Fuel','Utilities','Gift','Investment','Misc'];
-const CAT_COLORS = {Food:'#f5906c',Rent:'#6c63f5',EMI:'#f5c842',Shopping:'#f56c6c',Travel:'#63f5e8',Fuel:'#a0a0c0',Utilities:'#63a8f5',Gift:'#f563c8',Investment:'#3ecf8e',Misc:'#8a8aaa'};
-const CAT_ICONS  = {Food:'🍽',Rent:'🏠',EMI:'🚗',Shopping:'🛍',Travel:'✈',Fuel:'⛽',Utilities:'💡',Gift:'🎁',Investment:'📈',Misc:'📦'};
+const CATS = ['Food','Groceries','Medical','Entertainment','Personal','Rent','EMI','Shopping','Travel','Fuel','Utilities','Gift','Investment','Misc'];
+const CAT_COLORS = {Food:'#f5906c',Groceries:'#7bc67e',Medical:'#f56c6c',Entertainment:'#c863f5','Personal':'#f5a8d0',Rent:'#6c63f5',EMI:'#f5c842',Shopping:'#ff8a65',Travel:'#63f5e8',Fuel:'#a0a0c0',Utilities:'#63a8f5',Gift:'#f563c8',Investment:'#3ecf8e',Misc:'#8a8aaa'};
+const CAT_ICONS  = {Food:'🍽',Groceries:'🛒',Medical:'🏥',Entertainment:'🎬','Personal':'💆',Rent:'🏠',EMI:'🚗',Shopping:'🛍',Travel:'✈',Fuel:'⛽',Utilities:'💡',Gift:'🎁',Investment:'📈',Misc:'📦'};
 const SRC_COLORS = {'HDFC Regalia CC':'#6c63f5','ICICI Amazon CC':'#f5906c','HDFC Swiggy CC':'#f5c842','Axis Airtel CC':'#63f5e8','UPI – HDFC':'#3ecf8e','UPI – Axis/Airtel':'#63f5e8','UPI – BoB':'#a0c8f5','UPI – DCB':'#c8a0f5','UPI – Indian Bank':'#f5a0c8','Cash':'#f5f5a0'};
 const SRC_ICONS  = {'HDFC Regalia CC':'💳','ICICI Amazon CC':'💳','HDFC Swiggy CC':'💳','Axis Airtel CC':'💳','UPI – HDFC':'📱','UPI – Axis/Airtel':'📱','UPI – BoB':'📱','UPI – DCB':'📱','UPI – Indian Bank':'📱','Cash':'💵'};
 const MONTH_NAMES = {'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July','08':'August','09':'September','10':'October','11':'November','12':'December'};
@@ -708,7 +732,7 @@ const HIST = [
 
 // ── STATE ──
 let expenses = [];
-let budgets  = JSON.parse(localStorage.getItem('budgets_v2') || JSON.stringify({Food:25000,Rent:40000,EMI:18000,Shopping:12000,Travel:15000,Fuel:5000,Utilities:5000,Gift:5000,Misc:5000}));
+let budgets  = JSON.parse(localStorage.getItem('budgets_v2') || JSON.stringify({Food:15000,Groceries:10000,Medical:5000,Entertainment:5000,Personal:3000,Rent:40000,EMI:18000,Shopping:12000,Travel:15000,Fuel:5000,Utilities:5000,Gift:5000,Misc:5000}));
 const DEFAULT_SCRIPT_URL='https://script.google.com/macros/s/AKfycbyMmyaY5o5AmkH3MDxMJu7BQFWyrS_bkoa_Dz-CKOhgVRW-RXT6-HbL8RcN-iajHRx4/exec';
 let scriptUrl = localStorage.getItem('scriptUrl') || DEFAULT_SCRIPT_URL;
 // auto-save so Setup page shows connected state
@@ -720,6 +744,27 @@ let editingId    = null;
 let syncing      = false;
 
 // ── HELPERS ──
+// Convert any date format to YYYY-MM-DD
+function toISODate(d){
+  if(!d) return '';
+  const s = String(d).trim();
+  // Already YYYY-MM-DD
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // MM/DD/YYYY
+  const m1 = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m1) return m1[3]+'-'+m1[1].padStart(2,'0')+'-'+m1[2].padStart(2,'0');
+  // DD-MM-YYYY
+  const m2 = s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if(m2) return m2[3]+'-'+m2[2].padStart(2,'0')+'-'+m2[1].padStart(2,'0');
+  // Try native Date parse as last resort
+  try{
+    const dt=new Date(s);
+    if(!isNaN(dt.getTime())){
+      return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+    }
+  }catch(e){}
+  return '';
+}
 function normalizeDate(d){
   if(!d) return '';
   // already YYYY-MM-DD
@@ -745,7 +790,7 @@ function fmtDate(d){
   return dt.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
 }
 function getMonths(){const s=new Set(expenses.map(e=>e.date.slice(0,7)));s.add(getCurrentMonth());return[...s].sort().reverse()}
-function saveLocal(){localStorage.setItem('exp_local',JSON.stringify(expenses))}
+function saveLocal(){} // no-op - Google Sheets is single source of truth
 
 // ── SYNC STATUS ──
 function setSyncStatus(state,label){
@@ -759,66 +804,91 @@ function setSyncStatus(state,label){
 async function sheetCall(params){
   if(!scriptUrl)return null;
   const url=scriptUrl+'?'+new URLSearchParams(params).toString();
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),10000); // 10s timeout
   try{
-    const r=await fetch(url);
-    return await r.json();
-  }catch(e){return null}
+    const r=await fetch(url,{
+      method:'GET',
+      redirect:'follow',
+      signal:controller.signal,
+    });
+    clearTimeout(timer);
+    if(!r.ok){console.error('Sheet HTTP error:',r.status);return null;}
+    const respText=await r.text();
+    try{return JSON.parse(respText);}
+    catch(e){console.error('Sheet JSON error:',respText.slice(0,300));return null;}
+  }catch(e){
+    clearTimeout(timer);
+    if(e.name==='AbortError'){
+      console.error('Sheet timeout after 10s');
+      setSyncStatus('err','Timeout – check Apps Script deployment');
+    } else {
+      console.error('Sheet fetch error:',e.message);
+    }
+    return null;
+  }
 }
 
 async function fetchFromSheet(){
   if(!scriptUrl){
-    // use local / historical
-    const local=localStorage.getItem('exp_local');
-    const parsed = local ? JSON.parse(local) : [];
-    expenses = parsed.length > 0 ? parsed : [...HIST];
-    setSyncStatus('','Offline mode');
+    setSyncStatus('err','No sheet connected – go to Setup');
+    expenses=[];
+    hideLoading();
     return;
   }
-  setSyncStatus('loading','Fetching…');
-  showLoading('Fetching from Google Sheets…');
+  setSyncStatus('loading','Connecting…');
+  showLoading('Loading from Google Sheets…');
   const res=await sheetCall({action:'getAll'});
   hideLoading();
   if(res&&res.expenses){
     expenses=res.expenses.map(e=>({...e,amt:parseFloat(e.amt)||0,date:normalizeDate(e.date)}));
-    saveLocal();
     setSyncStatus('ok',`Synced · ${expenses.length} entries`);
-    showToast('✓ Loaded from Google Sheets');
   }else{
-    const local=localStorage.getItem('exp_local');
-    const parsed2 = local ? JSON.parse(local) : [];
-    expenses = parsed2.length > 0 ? parsed2 : [...HIST];
-    setSyncStatus('err','Sheet error – offline mode');
-    showToast('Sheet error, using local data','warn');
+    expenses=[];
+    setSyncStatus('err','Could not connect – check internet or redeploy script');
+    showToast('Could not reach Google Sheets','err');
   }
 }
 
 async function addToSheet(entry){
-  if(!scriptUrl){expenses.unshift(entry);saveLocal();return true}
+  if(!scriptUrl){showToast('Not connected to Google Sheets','err');return false;}
   setSyncStatus('loading','Saving…');
   const res=await sheetCall({action:'add',id:entry.id,date:entry.date,cat:entry.cat,src:entry.src,amt:entry.amt,note:entry.note||''});
   if(res&&res.success){
-    expenses.unshift(entry);saveLocal();
-    setSyncStatus('ok','Synced');
+    expenses.unshift(entry);
+    setSyncStatus('ok',`Synced · ${expenses.length} entries`);
     return true;
   }
   setSyncStatus('err','Save failed');
+  showToast('Save failed – check connection','err');
   return false;
 }
 
 async function editInSheet(entry){
-  if(!scriptUrl){const i=expenses.findIndex(e=>e.id===entry.id);if(i>=0)expenses[i]=entry;saveLocal();return true}
+  if(!scriptUrl){showToast('Not connected to Google Sheets','err');return false;}
   setSyncStatus('loading','Updating…');
   const res=await sheetCall({action:'edit',id:entry.id,date:entry.date,cat:entry.cat,src:entry.src,amt:entry.amt,note:entry.note||''});
-  if(res&&res.success){const i=expenses.findIndex(e=>e.id===entry.id);if(i>=0)expenses[i]=entry;saveLocal();setSyncStatus('ok','Synced');return true}
-  setSyncStatus('err','Update failed');return false;
+  if(res&&res.success){
+    const i=expenses.findIndex(e=>e.id===entry.id);
+    if(i>=0)expenses[i]=entry;
+    setSyncStatus('ok',`Synced · ${expenses.length} entries`);
+    return true;
+  }
+  setSyncStatus('err','Update failed');
+  return false;
 }
 
 async function deleteFromSheet(id){
-  if(!scriptUrl){expenses=expenses.filter(e=>e.id!==String(id));saveLocal();return true}
+  if(!scriptUrl){showToast('Not connected to Google Sheets','err');return false;}
   setSyncStatus('loading','Deleting…');
   const res=await sheetCall({action:'del',id});
-  if(res&&res.success){expenses=expenses.filter(e=>e.id!==String(id));saveLocal();setSyncStatus('ok','Synced');return true}
-  setSyncStatus('err','Delete failed');return false;
+  if(res&&res.success){
+    expenses=expenses.filter(e=>e.id!==String(id));
+    setSyncStatus('ok',`Synced · ${expenses.length} entries`);
+    return true;
+  }
+  setSyncStatus('err','Delete failed');
+  return false;
 }
 
 // ── PAGE NAV ──
@@ -946,7 +1016,8 @@ async function addExpense(){
   const cat=document.getElementById('catInput').value;
   const src=document.getElementById('srcInput').value;
   const note=document.getElementById('noteInput').value.trim();
-  const date=document.getElementById('dateInput').value;
+  const rawDate=document.getElementById('dateInput').value;
+  const date=toISODate(rawDate);
   if(!amt||amt<=0){document.getElementById('amtInput').focus();return}
   if(!date){showToast('Pick a date','warn');return}
   const entry={id:String(Date.now()),amt,cat,src,note,date};
@@ -982,7 +1053,10 @@ function closeModal(){document.getElementById('modalOverlay').classList.remove('
 async function saveEdit(){
   const amt=parseFloat(document.getElementById('editAmt').value);
   if(!amt||amt<=0)return;
-  const entry={id:editingId,amt,cat:document.getElementById('editCat').value,src:document.getElementById('editSrc').value,note:document.getElementById('editNote').value.trim(),date:document.getElementById('editDate').value};
+  const rawDate=document.getElementById('editDate').value;
+  const date=toISODate(rawDate);
+  if(!date){showToast('Invalid date','warn');return;}
+  const entry={id:editingId,amt,cat:document.getElementById('editCat').value,src:document.getElementById('editSrc').value,note:document.getElementById('editNote').value.trim(),date};
   const ok=await editInSheet(entry);
   if(ok){closeModal();renderAll();showToast('✓ Updated')}
   else showToast('Update failed','err');
@@ -1087,9 +1161,22 @@ async function connectSheet(){
   const url=document.getElementById('scriptUrlInput').value.trim();
   if(!url||!url.includes('script.google.com')){showToast('Paste a valid Apps Script URL','warn');return}
   scriptUrl=url;localStorage.setItem('scriptUrl',url);
-  showToast('Connecting…','warn');
-  await fetchFromSheet();
-  renderSetup();renderAll();
+  const btn=document.querySelector('.connect-btn');
+  if(btn){btn.textContent='Testing…';btn.disabled=true;}
+  setSyncStatus('loading','Testing connection…');
+  // Test connection
+  const res=await sheetCall({action:'getAll'});
+  if(btn){btn.textContent='Connect';btn.disabled=false;}
+  if(res&&res.expenses!==undefined){
+    showToast(`✓ Connected · ${res.expenses.length} entries found`);
+    await fetchFromSheet();
+    renderSetup();renderAll();
+  } else {
+    scriptUrl='';localStorage.removeItem('scriptUrl');
+    setSyncStatus('err','Connection failed');
+    showToast('Connection failed – see checklist below','err');
+    document.getElementById('connDiag').style.display='block';
+  }
 }
 function disconnectSheet(){
   if(!confirm('Disconnect Google Sheets? Data stays local.'))return;
@@ -1099,6 +1186,11 @@ function disconnectSheet(){
 }
 
 // ── EXPORT ──
+async function refreshFromSheet(){
+  await fetchFromSheet();
+  renderAll();
+}
+
 function exportCSV(){
   if(!expenses.length){showToast('No data','warn');return}
   const months=getMonths().slice().reverse();
@@ -1128,6 +1220,29 @@ function exportCSV(){
 }
 
 // ── TOAST / LOADING ──
+// ── THEME ──
+function toggleTheme(){
+  const current=document.documentElement.getAttribute('data-theme');
+  const next=current==='light'?'dark':'light';
+  applyTheme(next);
+}
+function applyTheme(theme){
+  if(theme==='light'){
+    document.documentElement.setAttribute('data-theme','light');
+    const btn=document.getElementById('themeBtn');
+    const btnM=document.getElementById('themeBtnMobile');
+    if(btn)btn.textContent='☀️ Light Mode';
+    if(btnM)btnM.textContent='☀️';
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    const btn=document.getElementById('themeBtn');
+    const btnM=document.getElementById('themeBtnMobile');
+    if(btn)btn.textContent='🌙 Dark Mode';
+    if(btnM)btnM.textContent='🌙';
+  }
+  localStorage.setItem('theme',theme);
+}
+
 let toastT;
 function showToast(msg,type=''){
   clearTimeout(toastT);
@@ -1149,6 +1264,9 @@ document.getElementById('catFilter').addEventListener('click',e=>{
 
 // ── INIT ──
 document.getElementById('dateInput').value=new Date().toISOString().split('T')[0];
+// Apply saved theme
+const savedTheme=localStorage.getItem('theme')||'dark';
+applyTheme(savedTheme);
 hideLoading();
 (async()=>{
   await fetchFromSheet();
