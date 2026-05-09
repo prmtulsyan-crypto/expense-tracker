@@ -671,15 +671,22 @@ select option{background:#18181f}
               <div class="field-lbl">Category Name</div>
               <input class="url-input" type="text" id="newCatName" placeholder="e.g. Pet Care">
             </div>
-            <div>
-              <div class="field-lbl">Icon (emoji)</div>
-              <input class="url-input" type="text" id="newCatIcon" placeholder="🐾" style="width:70px;text-align:center">
+            <div style="flex:0 0 auto">
+              <div class="field-lbl">Icon</div>
+              <button type="button" id="iconPickerBtn" onclick="toggleIconPicker()" style="width:52px;height:38px;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center">📦</button>
+              <input type="hidden" id="newCatIcon" value="📦">
             </div>
             <div>
               <div class="field-lbl">Color</div>
               <input type="color" id="newCatColor" value="#a0c4ff" style="width:50px;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--s2);cursor:pointer;padding:2px">
             </div>
             <button class="connect-btn" onclick="addCustomCat()">+ Add</button>
+          </div>
+
+          <!-- Icon picker grid -->
+          <div id="iconPickerGrid" style="display:none;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:.6rem;margin-bottom:.75rem">
+            <div style="font-size:.58rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">Pick an icon</div>
+            <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:.3rem" id="iconGrid"></div>
           </div>
 
           <div id="catManageList" style="display:flex;flex-direction:column;gap:.4rem"></div>
@@ -716,7 +723,7 @@ const INCOME = 250000;
 const CC_SOURCES = ['HDFC Regalia CC','ICICI Amazon CC','HDFC Swiggy CC','Axis Airtel CC'];
 const CATS_DEFAULT = ['Food','Groceries','Medical','Entertainment','Personal','Rent','EMI','Shopping','Travel','Fuel','Utilities','Gift','Investment','Policy Premium','Misc'];
 let CAT_COLORS = {Food:'#f5906c',Groceries:'#7bc67e',Medical:'#f56c6c',Entertainment:'#c863f5',Personal:'#f5a8d0',Rent:'#6c63f5',EMI:'#f5c842',Shopping:'#ff8a65',Travel:'#63f5e8',Fuel:'#a0a0c0',Utilities:'#63a8f5',Gift:'#f563c8',Investment:'#3ecf8e','Policy Premium':'#63c5f5',Misc:'#8a8aaa'};
-const CAT_ICONS  = {Food:'🍽',Groceries:'🛒',Medical:'🏥',Entertainment:'🎬','Personal':'💆',Rent:'🏠',EMI:'🚗',Shopping:'🛍',Travel:'✈',Fuel:'⛽',Utilities:'💡',Gift:'🎁',Investment:'📈',Misc:'📦'};
+let CAT_ICONS   = {Food:'🍽',Groceries:'🛒',Medical:'🏥',Entertainment:'🎬',Personal:'💆',Rent:'🏠',EMI:'🚗',Shopping:'🛍',Travel:'✈',Fuel:'⛽',Utilities:'💡',Gift:'🎁',Investment:'📈','Policy Premium':'📋',Misc:'📦'};
 const SRC_COLORS = {'HDFC Regalia CC':'#6c63f5','ICICI Amazon CC':'#f5906c','HDFC Swiggy CC':'#f5c842','Axis Airtel CC':'#63f5e8','UPI – HDFC':'#3ecf8e','UPI – Axis/Airtel':'#63f5e8','UPI – BoB':'#a0c8f5','UPI – DCB':'#c8a0f5','UPI – Indian Bank':'#f5a0c8','Cash':'#f5f5a0'};
 const SRC_ICONS  = {'HDFC Regalia CC':'💳','ICICI Amazon CC':'💳','HDFC Swiggy CC':'💳','Axis Airtel CC':'💳','UPI – HDFC':'📱','UPI – Axis/Airtel':'📱','UPI – BoB':'📱','UPI – DCB':'📱','UPI – Indian Bank':'📱','Cash':'💵'};
 const MONTH_NAMES = {'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July','08':'August','09':'September','10':'October','11':'November','12':'December'};
@@ -867,25 +874,36 @@ function setSyncStatus(state,label){
 // ── GOOGLE SHEETS API ──
 async function sheetCall(params){
   if(!scriptUrl)return null;
-  const url=scriptUrl+'?'+new URLSearchParams(params).toString();
   const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),10000); // 10s timeout
+  const timer=setTimeout(()=>controller.abort(),12000);
+  // Use GET for reads, POST for writes (avoids URL length/encoding issues)
+  const isWrite = ['add','edit','del'].includes(params.action);
   try{
-    const r=await fetch(url,{
-      method:'GET',
-      redirect:'follow',
-      signal:controller.signal,
-    });
+    let r;
+    if(isWrite){
+      // POST with JSON body - handles special chars, long notes safely
+      r=await fetch(scriptUrl,{
+        method:'POST',
+        redirect:'follow',
+        signal:controller.signal,
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:new URLSearchParams(params).toString(),
+      });
+    } else {
+      // GET for reads
+      const url=scriptUrl+'?'+new URLSearchParams(params).toString();
+      r=await fetch(url,{method:'GET',redirect:'follow',signal:controller.signal});
+    }
     clearTimeout(timer);
-    if(!r.ok){console.error('Sheet HTTP error:',r.status);return null;}
+    if(!r.ok){console.error('Sheet HTTP error:',r.status,r.statusText);return null;}
     const respText=await r.text();
     try{return JSON.parse(respText);}
     catch(e){console.error('Sheet JSON error:',respText.slice(0,300));return null;}
   }catch(e){
     clearTimeout(timer);
     if(e.name==='AbortError'){
-      console.error('Sheet timeout after 10s');
-      setSyncStatus('err','Timeout – check Apps Script deployment');
+      setSyncStatus('err','Timeout – check Apps Script');
+      showToast('Connection timed out','err');
     } else {
       console.error('Sheet fetch error:',e.message);
     }
@@ -1275,6 +1293,42 @@ async function connectSheet(){
     document.getElementById('connDiag').style.display='block';
   }
 }
+const ICON_OPTIONS = [
+  '🍽','🛒','🏥','🎬','💆','🏠','🚗','🛍','✈','⛽','💡','🎁','📈','📋','📦',
+  '🐾','💊','🧴','👗','🎮','🎵','📚','🏋','🚴','🍺','☕','🍕','🧹','🔧','💻',
+  '📱','🎓','🏖','🚕','🛺','🚌','🏪','💈','🧺','🪴','🐕','🐈','👶','💐','🎂',
+  '🏦','💳','🔐','📊','🧾','🪙','💰','🏗','🛠','⚡','🌐','📡','🎯','🎪','🎠'
+];
+
+function toggleIconPicker(){
+  const grid = document.getElementById('iconPickerGrid');
+  if(grid.style.display==='none'){
+    renderIconGrid();
+    grid.style.display='block';
+  } else {
+    grid.style.display='none';
+  }
+}
+
+function renderIconGrid(){
+  const grid = document.getElementById('iconGrid');
+  const current = document.getElementById('newCatIcon').value;
+  grid.innerHTML = ICON_OPTIONS.map(icon => `
+    <button type="button" onclick="selectIcon('${icon}')" style="
+      background:${icon===current?'var(--accent-glow)':'transparent'};
+      border:1.5px solid ${icon===current?'var(--accent)':'transparent'};
+      border-radius:7px;padding:.3rem;font-size:1.1rem;cursor:pointer;
+      transition:all .1s;line-height:1;aspect-ratio:1
+    ">${icon}</button>
+  `).join('');
+}
+
+function selectIcon(icon){
+  document.getElementById('newCatIcon').value = icon;
+  document.getElementById('iconPickerBtn').textContent = icon;
+  document.getElementById('iconPickerGrid').style.display='none';
+}
+
 function addCustomCat(){
   const name = document.getElementById('newCatName').value.trim();
   const icon = document.getElementById('newCatIcon').value.trim() || '📦';
@@ -1283,7 +1337,9 @@ function addCustomCat(){
   if(CATS.includes(name)){showToast('Category already exists','warn');return;}
   saveCustomCat(name, icon, color);
   document.getElementById('newCatName').value='';
-  document.getElementById('newCatIcon').value='';
+  document.getElementById('newCatIcon').value='📦';
+  document.getElementById('iconPickerBtn').textContent='📦';
+  document.getElementById('iconPickerGrid').style.display='none';
   renderCatManageList();
   renderCatDropdowns();
   renderCatPills();
