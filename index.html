@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Expense Tracker</title>
@@ -21,10 +21,10 @@
   --invest:#3ecf8e;--misc:#8a8aaa;
 }
 
-html,body{height:100%;font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);overflow-x:hidden}
+html{height:100%;background:var(--bg)}body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100%;min-height:-webkit-fill-available}
 
 /* ── LAYOUT ── */
-.app{display:flex;min-height:100vh}
+.app{display:flex;min-height:100vh;min-height:-webkit-fill-available}
 
 /* SIDEBAR (desktop) */
 .sidebar{
@@ -55,7 +55,7 @@ html,body{height:100%;font-family:'DM Mono',monospace;background:var(--bg);color
 .content-wrap{width:100%;max-width:1100px;margin:0 auto;display:flex;flex-direction:column;flex:1;min-height:0}
 
 /* MOBILE NAV (bottom) */
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);z-index:30;padding:.5rem 0 .6rem}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);z-index:30;padding:.5rem 0 env(safe-area-inset-bottom,.6rem)}
 .mobile-nav-inner{display:flex;justify-content:space-around}
 .m-tab{display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.3rem .8rem;font-family:'Syne',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color .15s;background:none;border:none}
 .m-tab .icon{font-size:1.1rem}
@@ -153,7 +153,7 @@ select option{background:#18181f}
 .day-sep{padding:.5rem 1rem .2rem;font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-family:'Syne',sans-serif}
 
 /* BOTTOM STATS (mobile) */
-.bottom-stats{position:fixed;bottom:56px;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);padding:.55rem .9rem;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;z-index:20}
+.bottom-stats{position:fixed;bottom:calc(56px + env(safe-area-inset-bottom, 0px));left:0;right:0;background:var(--s1);border-top:1px solid var(--border);padding:.55rem .9rem;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;z-index:20}
 .bs-item{text-align:center;padding:0 .2rem}
 .bs-item+.bs-item{border-left:1px solid var(--border)}
 .bs-val{font-size:.78rem;font-weight:700;font-family:'Syne',sans-serif}
@@ -267,9 +267,9 @@ select option{background:#18181f}
 .empty p{font-size:.8rem;line-height:1.8}
 
 /* ── RESPONSIVE ── */
-@media(max-width:768px){
+@media screen and (max-width:768px){
   .sidebar{display:none}
-  .main{margin-left:0;padding-bottom:110px}
+  .main{margin-left:0;padding-bottom:calc(110px + env(safe-area-inset-bottom, 0px))}
   .mobile-nav{display:block}
   .bottom-stats{bottom:56px;display:grid}
   .desktop-stats{display:none!important}
@@ -294,7 +294,7 @@ select option{background:#18181f}
 .entries-wrap table,.entries-wrap .entries-cards{max-width:1000px;margin:0 auto;width:100%}
 .sum-content,.budget-content,.setup-content{max-width:1000px;margin:0 auto;width:100%}
 
-@media(min-width:769px){
+@media screen and (min-width:769px){
   .bottom-stats{display:none}
   .mobile-nav{display:none}
   .desktop-stats{display:flex!important}
