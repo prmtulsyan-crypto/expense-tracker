@@ -803,7 +803,9 @@ function deleteCustomCat(name){
   showToast(`✓ ${name} removed`);
 }
 
-let budgets  = JSON.parse(localStorage.getItem('budgets_v2') || JSON.stringify({Food:15000,Groceries:10000,Medical:5000,Entertainment:5000,Personal:3000,Rent:40000,EMI:18000,Shopping:12000,Travel:15000,Fuel:5000,Utilities:5000,Gift:5000,Misc:5000,'Policy Premium':5000}));
+// Budgets live in Google Sheets - defaults used until sheet responds
+const BUDGET_DEFAULTS = {Food:15000,Groceries:10000,Medical:5000,Entertainment:5000,Personal:3000,Rent:40000,EMI:18000,Shopping:12000,Travel:15000,Fuel:5000,Utilities:5000,Gift:5000,'Policy Premium':5000,Misc:5000};
+let budgets = {...BUDGET_DEFAULTS};
 const DEFAULT_SCRIPT_URL='https://script.google.com/macros/s/AKfycbyMmyaY5o5AmkH3MDxMJu7BQFWyrS_bkoa_Dz-CKOhgVRW-RXT6-HbL8RcN-iajHRx4/exec';
 let scriptUrl = localStorage.getItem('scriptUrl') || DEFAULT_SCRIPT_URL;
 // auto-save so Setup page shows connected state
@@ -1257,11 +1259,12 @@ function renderBudget(){
     </div>`;
   }).join('');
 }
-function saveBudget(cat){
+async function saveBudget(cat){
   const v=parseFloat(document.getElementById('bl_'+cat).value);
   if(!v||v<=0){showToast('Enter a valid amount','warn');return}
-  budgets[cat]=v;localStorage.setItem('budgets_v2',JSON.stringify(budgets));
-  renderBudget();showToast(`✓ ${cat} → ${fmt(v)}/mo`);
+  showToast('Saving…','warn');
+  const ok = await syncBudgetToSheet(cat, v);
+  if(ok){ renderBudget(); showToast(`✓ ${cat} → ${fmt(v)}/mo`); }
 }
 
 // ── SETUP ──
@@ -1372,8 +1375,25 @@ function disconnectSheet(){
 
 // ── EXPORT ──
 async function refreshFromSheet(){
-  await fetchFromSheet();
+  await Promise.all([fetchFromSheet(), fetchBudgets()]);
   renderAll();
+}
+
+async function fetchBudgets(){
+  if(!scriptUrl) return;
+  const res = await sheetCall({action:'getBudgets'});
+  if(res && res.budgets && Object.keys(res.budgets).length > 0){
+    budgets = {...BUDGET_DEFAULTS, ...res.budgets};
+  }
+}
+
+async function syncBudgetToSheet(cat, amt){
+  budgets[cat] = amt;
+  if(!scriptUrl){ showToast('Not connected','err'); return false; }
+  const res = await sheetCall({action:'saveBudgets', data: JSON.stringify(budgets)});
+  if(res && res.success) return true;
+  showToast('Budget save failed','err');
+  return false;
 }
 
 function exportCSV(){
@@ -1457,7 +1477,7 @@ renderCatDropdowns();
 renderCatPills();
 hideLoading();
 (async()=>{
-  await fetchFromSheet();
+  await Promise.all([fetchFromSheet(), fetchBudgets()]);
   activeMonth=getMonths()[0];
   sumMonth=getMonths()[0];
   renderAll();
