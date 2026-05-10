@@ -5,377 +5,392 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Expense Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Finlo</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Satoshi:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
 :root{
-  --bg:#0a0a0d;--s1:#111116;--s2:#18181f;--s3:#202028;
-  --border:#28282f;--border2:#32323c;
-  --text:#eeeef5;--muted:#5a5a6a;--muted2:#8a8a9a;
-  --accent:#6c63f5;--accent-glow:rgba(108,99,245,.15);
-  --green:#3ecf8e;--red:#f56c6c;--gold:#f5c842;--orange:#f5906c;
-  --sidebar:200px;
-  --food:#f5906c;--rent:#6c63f5;--emi:#f5c842;--shop:#f56c6c;
-  --travel:#63f5e8;--fuel:#a0a0c0;--util:#63a8f5;--gift:#f563c8;
-  --invest:#3ecf8e;--misc:#8a8aaa;
+  --bg:#F8F7F4;--card:#FFFFFF;--card2:#F2F0EC;--card3:#E8E5DF;
+  --border:#E0DDD6;--text:#1A1814;--muted:#9A9589;--muted2:#C4C0B8;
+  --accent:#2D2926;--gold:#E8A830;--green:#3DB87A;--red:#E85D3D;
+  --blue:#4A90D9;--purple:#8B5CF6;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --nav-h:72px;
 }
-[data-theme="light"]{
-  --bg:#f5f5f7;--s1:#ffffff;--s2:#f0f0f5;--s3:#e8e8f0;
-  --border:#dddde8;--border2:#cacad8;
-  --text:#111116;--muted:#888899;--muted2:#666677;
-  --accent:#6c63f5;--accent-glow:rgba(108,99,245,.12);
-  --green:#2eb878;--red:#e55555;--gold:#c49a00;--orange:#d06848;
+[data-theme="dark"]{
+  --bg:#0D0D0F;--card:#161618;--card2:#1E1E22;--card3:#26262B;
+  --border:#2C2C32;--text:#F0EFF5;--muted:#636270;--muted2:#42414E;
+  --accent:#F0EFF5;--gold:#F0A830;--green:#3DB87A;--red:#F56C6C;
+  --blue:#63A8F5;--purple:#A07CF5;
 }
 
-html{height:100%;background:var(--bg);overflow-x:hidden}body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100%;min-height:-webkit-fill-available;width:100%;max-width:100vw}
-
-/* ── LAYOUT ── */
-.app{display:flex;min-height:100vh;min-height:-webkit-fill-available;overflow-x:hidden;width:100%}
-
-/* SIDEBAR (desktop) */
-.sidebar{
-  width:var(--sidebar);flex-shrink:0;
-  background:var(--s1);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  position:fixed;top:0;left:0;height:100vh;z-index:30;
-  padding:1.25rem 0;
+html{height:100%;background:var(--bg)}
+body{
+  font-family:'Satoshi',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100%;min-height:-webkit-fill-available;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
 }
-.sidebar-logo{padding:0 1.4rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
-.sidebar-logo h1{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;line-height:1.2}
-.sidebar-logo p{font-size:.6rem;color:var(--muted);margin-top:.2rem}
-.sidebar-nav{flex:1;padding:0 .7rem}
-.s-tab{display:flex;align-items:center;gap:.7rem;padding:.7rem .8rem;border-radius:9px;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:.2rem}
-.s-tab:hover{background:var(--s2);color:var(--text)}
-.s-tab.active{background:var(--accent-glow);color:var(--accent)}
-.s-tab .icon{font-size:.95rem;width:20px;text-align:center}
-.sidebar-bottom{padding:.7rem;border-top:1px solid var(--border);margin-top:auto}
-.sync-status{font-size:.6rem;color:var(--muted);padding:.5rem .8rem;display:flex;align-items:center;gap:.4rem}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
-.sync-dot.ok{background:var(--green)}
-.sync-dot.err{background:var(--red)}
-.sync-dot.loading{background:var(--gold);animation:blink .8s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* MAIN CONTENT */
-.main{flex:1;margin-left:var(--sidebar);min-height:100vh;display:flex;flex-direction:column;background:var(--bg)}
-.content-wrap{width:100%;display:flex;flex-direction:column;flex:1;min-height:0}
-
-/* MOBILE NAV (bottom) */
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);z-index:30;padding:.5rem 0 env(safe-area-inset-bottom,.6rem)}
-.mobile-nav-inner{display:flex;justify-content:space-around}
-.m-tab{display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.3rem .8rem;font-family:'Syne',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color .15s;background:none;border:none}
-.m-tab .icon{font-size:1.1rem}
-.m-tab.active{color:var(--accent)}
-
-/* PAGES */
-.page{display:none;flex:1;flex-direction:column}
+/* ── PAGES ── */
+.app{min-height:100vh;min-height:-webkit-fill-available;display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative}
+.page{display:none;flex-direction:column;min-height:100vh;padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px)}
 .page.active{display:flex}
 
-/* ── HEADER BAR ── */
-.page-header{padding:1rem 1rem .8rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end;flex-shrink:0;width:100%;box-sizing:border-box}
-.page-header h2{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800}
-.page-header p{font-size:.65rem;color:var(--muted);margin-top:.2rem}
-.header-right{text-align:right}
-.header-right .amt{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--accent)}
-.header-right .lbl{font-size:.6rem;color:var(--muted)}
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;
+  background:var(--card);border-top:1px solid var(--border);
+  padding:.6rem 1rem calc(.6rem + var(--safe-bottom));
+  display:grid;grid-template-columns:1fr 1fr 80px 1fr 1fr;
+  align-items:center;gap:.25rem;z-index:50;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:.3rem;cursor:pointer;transition:all .2s;background:none;border:none}
+.nav-icon{font-size:1.3rem;line-height:1}
+.nav-label{font-size:.52rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:color .2s;font-family:'Satoshi',sans-serif}
+.nav-item.active .nav-label{color:var(--gold)}
+.nav-item.active .nav-icon{transform:scale(1.1)}
 
-/* MONTH TABS */
-.month-row{display:flex;align-items:center;padding-right:1rem;border-bottom:1px solid var(--border);flex-shrink:0}
-.month-tabs{display:flex;gap:.35rem;padding:.55rem .9rem;overflow-x:auto;scrollbar-width:none;flex:1;-webkit-overflow-scrolling:touch}
-.month-tabs::-webkit-scrollbar{display:none}
-.m-month{flex-shrink:0;padding:.3rem .65rem;border-radius:6px;font-size:.65rem;font-weight:700;font-family:'Syne',sans-serif;background:transparent;border:1.5px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s}
-.m-month.active{background:var(--s3);border-color:var(--accent);color:var(--text)}
-.export-btn{flex-shrink:0;background:none;border:1.5px solid var(--border);color:var(--muted);border-radius:6px;padding:.3rem .65rem;font-family:'Syne',sans-serif;font-size:.63rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
-.export-btn:hover{color:var(--text);border-color:var(--border2)}
+/* FAB */
+.fab{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),#D4922A);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;color:white;margin:-20px auto 0;
+  box-shadow:0 8px 24px rgba(232,168,48,.4);
+  transition:transform .15s,box-shadow .15s;position:relative;z-index:2;
+}
+.fab:active{transform:scale(.92);box-shadow:0 4px 12px rgba(232,168,48,.3)}
 
-/* CAT FILTER */
-.cats{display:flex;gap:.4rem;padding:.5rem .9rem;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);flex-shrink:0;-webkit-overflow-scrolling:touch}
-.cats::-webkit-scrollbar{display:none}
-.cat-pill{flex-shrink:0;padding:.28rem .65rem;border-radius:20px;font-size:.63rem;font-weight:600;font-family:'Syne',sans-serif;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
-.cat-pill.active{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+/* ── HOME PAGE ── */
+.home-header{
+  padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.25rem 1.25rem;
+  background:var(--header-bg, #2D2926);color:white;
+  border-radius:0 0 28px 28px;
+}
+:root{ --header-bg:#2D2926; }
+[data-theme="dark"]{ --header-bg:#1A1A2E; }
+.home-greeting{font-size:.75rem;opacity:.6;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.home-name{font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:600;margin-bottom:1.2rem}
 
-/* ADD FORM */
-.add-section{padding:.8rem .9rem;border-bottom:1px solid var(--border);flex-shrink:0;box-sizing:border-box;width:100%}
-.add-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;align-items:end}
-.add-grid.wide{grid-template-columns:1fr 1fr 1fr 1fr 1fr}
-.field-lbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem;font-family:'Syne',sans-serif}
-.field-select,.field-input{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:.55rem .7rem;font-family:'DM Mono',monospace;font-size:.75rem;color:var(--text);outline:none;width:100%;appearance:none;-webkit-appearance:none;transition:border-color .15s}
-.field-select:focus,.field-input:focus{border-color:var(--accent)}
-select option{background:#18181f}
-.amt-wrap{position:relative}
-.amt-prefix{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.9rem;font-family:'Syne',sans-serif}
-.field-input.amt{padding-left:1.5rem;font-size:.9rem;font-weight:700;font-family:'Syne',sans-serif}
-.add-btn{background:var(--accent);color:white;border:none;border-radius:9px;padding:.58rem 1.2rem;font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;letter-spacing:.05em;white-space:nowrap;transition:opacity .15s,transform .1s;width:100%}
-.add-btn:active{opacity:.85;transform:scale(.98)}
+/* Balance card */
+.balance-card{
+  background:rgba(255,255,255,.08);border-radius:20px;padding:1.1rem;
+  backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);
+}
+.balance-lbl{font-size:.65rem;opacity:.6;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem}
+.balance-amt{font-family:'Clash Display',sans-serif;font-size:2.2rem;font-weight:700;line-height:1;margin-bottom:.75rem}
+.balance-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.balance-sub{background:rgba(255,255,255,.08);border-radius:12px;padding:.6rem .75rem}
+.balance-sub-lbl{font-size:.58rem;opacity:.55;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.2rem}
+.balance-sub-val{font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:600}
+.balance-sub-val.pos{color:#5EE89A}
+.balance-sub-val.neg{color:#FF8570}
 
-/* SEARCH */
-.search-wrap{padding:.5rem .9rem;border-bottom:1px solid var(--border);position:relative;flex-shrink:0;box-sizing:border-box;width:100%}
-.search-input{width:100%;background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:.5rem .7rem .5rem 2rem;font-family:'DM Mono',monospace;font-size:.75rem;color:var(--text);outline:none;transition:border-color .15s}
-.search-input:focus{border-color:var(--accent)}
-.search-input::placeholder{color:var(--muted)}
-.search-icon{position:absolute;left:1.8rem;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:.78rem}
+/* Month tabs */
+.month-scroll{display:flex;gap:.5rem;padding:.9rem 1.25rem .2rem;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.month-scroll::-webkit-scrollbar{display:none}
+.month-chip{flex-shrink:0;padding:.35rem .9rem;border-radius:20px;font-size:.72rem;font-weight:700;font-family:'Satoshi',sans-serif;letter-spacing:.04em;border:1.5px solid var(--border);color:var(--muted);background:var(--card);cursor:pointer;transition:all .18s}
+.month-chip.active{background:var(--gold);border-color:var(--gold);color:white;box-shadow:0 4px 12px rgba(232,168,48,.3)}
 
-/* ENTRIES */
-.entries-wrap{flex:1;overflow-y:auto;padding:0}
-.entries-wrap-inner{width:100%;max-width:1200px;margin:0 auto}
-.entries-header{padding:.5rem 1.2rem .3rem;display:flex;justify-content:space-between;align-items:center}
-.entries-header h3{font-size:.63rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-family:'Syne',sans-serif}
-.entries-count{font-size:.63rem;color:var(--muted)}
+/* Cat pills */
+.cat-scroll{display:flex;gap:.4rem;padding:.5rem 1.25rem;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.cat-scroll::-webkit-scrollbar{display:none}
+.cat-pill{flex-shrink:0;padding:.28rem .75rem;border-radius:20px;font-size:.65rem;font-weight:700;letter-spacing:.04em;border:1.5px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;transition:all .18s}
+.cat-pill.active{background:var(--text);border-color:var(--text);color:var(--bg)}
 
-/* DESKTOP TABLE */
-.entries-table{display:none;width:100%;border-collapse:collapse;font-size:.75rem}
-.entries-table th{padding:.6rem 1.2rem;text-align:left;font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--s1);position:sticky;top:0;z-index:5}
-.entries-table td{padding:.65rem 1.2rem;border-bottom:1px solid var(--border);vertical-align:middle}
-.entries-table tr:hover td{background:var(--s1)}
-.entries-table .day-row td{background:var(--s2);font-family:'Syne',sans-serif;font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:.4rem 1.2rem}
-.tbl-cat{display:flex;align-items:center;gap:.5rem}
-.tbl-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.78rem;flex-shrink:0}
-.tbl-cat-name{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700}
-.tbl-src{font-size:.65rem;font-weight:500}
-.tbl-amt{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;text-align:right}
-.tbl-note{font-size:.65rem;color:var(--muted);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tbl-date{font-size:.65rem;color:var(--muted)}
-.tbl-actions{display:flex;gap:.3rem;justify-content:flex-end}
-.tbl-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:5px;padding:.2rem .5rem;font-size:.65rem;cursor:pointer;transition:all .15s;font-family:'Syne',sans-serif;font-weight:600}
-.tbl-btn.edit:hover{border-color:var(--accent);color:var(--accent)}
-.tbl-btn.del:hover{border-color:var(--red);color:var(--red)}
+/* Entry list */
+.entries-section{flex:1;padding:.25rem 1.25rem 0;overflow-y:auto}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+.section-title{font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:600}
+.section-count{font-size:.65rem;color:var(--muted);font-weight:500}
 
-/* MOBILE CARDS */
-.entries-cards{padding:0 .9rem;display:flex;flex-direction:column;gap:.4rem;padding-bottom:1rem;box-sizing:border-box;width:100%}
-.entry{background:var(--s1);border-radius:11px;padding:.72rem .85rem;display:flex;align-items:center;gap:.65rem;border:1px solid var(--border);animation:slideIn .2s ease}
-@keyframes slideIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-.entry-icon{width:33px;height:33px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
-.entry-info{flex:1;min-width:0}
-.entry-cat{font-size:.72rem;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:1px}
-.entry-src{font-size:.6rem;font-weight:500;opacity:.85}
-.entry-note{font-size:.6rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Day group */
+.day-group{margin-bottom:1rem}
+.day-label{font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:.4rem 0 .5rem;display:flex;justify-content:space-between;align-items:center}
+.day-total{font-size:.65rem;color:var(--text);font-weight:600}
+
+/* Entry card */
+.entry-card{
+  background:var(--card);border-radius:16px;padding:.85rem 1rem;
+  display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem;
+  border:1px solid var(--border);
+  transition:transform .1s,background .2s;cursor:pointer;
+  animation:entryIn .25s ease both;
+}
+.entry-card:hover{background:var(--card2)}
+.entry-card:active{transform:scale(.98)}
+@keyframes entryIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.entry-icon-wrap{
+  width:42px;height:42px;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+}
+.entry-body{flex:1;min-width:0}
+.entry-cat{font-weight:700;font-size:.82rem;margin-bottom:.15rem;font-family:'Satoshi',sans-serif}
+.entry-meta{font-size:.65rem;color:var(--muted);display:flex;gap:.4rem;align-items:center}
+.entry-src-dot{width:5px;height:5px;border-radius:50%;background:var(--muted2);flex-shrink:0}
 .entry-right{text-align:right;flex-shrink:0}
-.entry-amt{font-size:.88rem;font-weight:700;font-family:'Syne',sans-serif}
-.entry-date{font-size:.58rem;color:var(--muted);margin-top:1px}
-.entry-actions{display:flex;flex-direction:column;gap:.15rem;flex-shrink:0}
-.entry-btn{background:none;border:none;color:var(--border2);font-size:.75rem;cursor:pointer;padding:.2rem;line-height:1;transition:color .15s}
-.entry-btn.edit:active{color:var(--accent)}
-.entry-btn.del:active{color:var(--red)}
-.day-sep{padding:.5rem 1rem .2rem;font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-family:'Syne',sans-serif}
+.entry-amt{font-family:'Clash Display',sans-serif;font-size:.95rem;font-weight:700}
+.entry-date{font-size:.6rem;color:var(--muted);margin-top:.15rem}
 
-/* BOTTOM STATS (mobile) */
-.bottom-stats{position:fixed;bottom:calc(56px + env(safe-area-inset-bottom, 0px));left:0;right:0;background:var(--s1);border-top:1px solid var(--border);padding:.55rem .9rem;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;z-index:20}
-.bs-item{text-align:center;padding:0 .2rem}
-.bs-item+.bs-item{border-left:1px solid var(--border)}
-.bs-val{font-size:.78rem;font-weight:700;font-family:'Syne',sans-serif}
-.bs-lbl{font-size:.5rem;color:var(--muted);margin-top:1px;text-transform:uppercase;letter-spacing:.08em;font-family:'Syne',sans-serif}
-.bs-item.spend .bs-val{color:var(--orange)}
-.bs-item.invest .bs-val{color:var(--green)}
-.bs-item.cc .bs-val{color:var(--accent)}
-.bs-item.left .bs-val{color:var(--gold)}
+.empty-state{text-align:center;padding:3rem 1.5rem;color:var(--muted)}
+.empty-emoji{font-size:3rem;margin-bottom:.75rem;display:block}
+.empty-text{font-size:.82rem;line-height:1.7}
 
-/* DESKTOP STATS BAR */
-.desktop-stats{display:none;padding:.8rem 1.5rem;border-bottom:1px solid var(--border);gap:0;flex-shrink:0}
-.ds-item{flex:1;text-align:center;padding:.5rem}
-.ds-item+.ds-item{border-left:1px solid var(--border)}
-.ds-val{font-size:1.1rem;font-weight:800;font-family:'Syne',sans-serif}
-.ds-lbl{font-size:.6rem;color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.08em;font-family:'Syne',sans-serif}
-.ds-item.spend .ds-val{color:var(--orange)}
-.ds-item.invest .ds-val{color:var(--green)}
-.ds-item.cc .ds-val{color:var(--accent)}
-.ds-item.left .ds-val{color:var(--gold)}
+/* ── ADD SHEET (slide up) ── */
+.sheet-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:80;
+  display:none;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+@media(min-width:769px){
+  .sheet-overlay,.edit-sheet-overlay{align-items:center}
+  .sheet,.edit-sheet{border-radius:24px;max-height:85vh;max-width:480px}
+}
+.sheet-overlay.open{display:flex}
+.sheet{
+  background:var(--card);border-radius:24px 24px 0 0;
+  padding:0 1.25rem calc(1.5rem + var(--safe-bottom));
+  width:100%;max-width:480px;
+  animation:sheetUp .3s cubic-bezier(.32,1.6,.64,1);
+  max-height:92vh;overflow-y:auto;
+}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 1.2rem}
+.sheet-title{font-family:'Clash Display',sans-serif;font-size:1.2rem;font-weight:600;margin-bottom:1.2rem;display:flex;justify-content:space-between;align-items:center}
+.sheet-close{background:var(--card2);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;color:var(--muted)}
+
+/* Amount input */
+.amt-display{text-align:center;padding:1rem 0 1.25rem;border-bottom:1px solid var(--border);margin-bottom:1.1rem}
+.amt-prefix{font-size:1.5rem;color:var(--muted);font-family:'Clash Display',sans-serif;vertical-align:super}
+.amt-input{
+  font-family:'Clash Display',sans-serif;font-size:3rem;font-weight:700;
+  background:none;border:none;outline:none;color:var(--text);
+  width:200px;text-align:center;
+}
+.amt-input::placeholder{color:var(--muted2)}
+
+/* Form fields */
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem}
+.field-col{display:flex;flex-direction:column;gap:.25rem}
+.field-lbl{font-size:.58rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.field-ctrl{
+  background:var(--card2);border:1.5px solid var(--border);border-radius:12px;
+  padding:.65rem .85rem;font-family:'Satoshi',sans-serif;font-size:.82rem;
+  color:var(--text);outline:none;width:100%;appearance:none;-webkit-appearance:none;
+  transition:border-color .15s;
+}
+.field-ctrl:focus{border-color:var(--gold)}
+select.field-ctrl option{background:var(--card)}
+.note-field{width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:.65rem .85rem;font-family:'Satoshi',sans-serif;font-size:.82rem;color:var(--text);outline:none;margin-bottom:.75rem;transition:border-color .15s}
+.note-field:focus{border-color:var(--gold)}
+.note-field::placeholder{color:var(--muted2)}
+
+.submit-btn{
+  width:100%;background:linear-gradient(135deg,var(--gold),#D4922A);
+  color:white;border:none;border-radius:16px;padding:1rem;
+  font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:600;
+  cursor:pointer;letter-spacing:.04em;
+  box-shadow:0 6px 20px rgba(232,168,48,.35);
+  transition:transform .1s,box-shadow .1s;
+}
+.submit-btn:active{transform:scale(.98);box-shadow:0 3px 10px rgba(232,168,48,.25)}
 
 /* ── SUMMARY PAGE ── */
-.sum-content{flex:1;overflow-y:auto;padding:1.2rem 1.5rem;box-sizing:border-box}
-.sum-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem;margin-bottom:1.2rem}
-.stat-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:1rem}
-.stat-card .lbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-family:'Syne',sans-serif;margin-bottom:.3rem}
-.stat-card .val{font-size:1.2rem;font-weight:800;font-family:'Syne',sans-serif}
-.stat-card .sub{font-size:.58rem;color:var(--muted);margin-top:.2rem}
-.chart-block,.trend-block{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:.9rem}
-.chart-title{font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.85rem}
-.bar-chart{display:flex;flex-direction:column;gap:.5rem}
-.bar-row{display:flex;align-items:center;gap:.55rem}
-.bar-label{font-size:.65rem;width:80px;flex-shrink:0;font-family:'Syne',sans-serif;font-weight:600}
-.bar-track{flex:1;height:7px;background:var(--s3);border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.22,1,.36,1)}
-.bar-amt{font-size:.62rem;color:var(--muted);width:55px;text-align:right;flex-shrink:0;font-family:'Syne',sans-serif}
-.trend-bars{display:flex;align-items:flex-end;gap:.6rem;height:90px;margin-bottom:.45rem;position:relative}
-.trend-bars::after{content:'';position:absolute;bottom:0;left:0;right:0;border-bottom:1px solid var(--border2)}
-.trend-group{flex:1;display:flex;flex-direction:column;align-items:center}
-.trend-inner{display:flex;align-items:flex-end;gap:3px;height:90px}
-.trend-bar{width:100%;min-width:16px;border-radius:3px 3px 0 0;transition:height .9s cubic-bezier(.22,1,.36,1);min-height:2px}
-.trend-lbl{font-size:.55rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;margin-top:.3rem;text-align:center}
-.trend-legend{display:flex;gap:.9rem;flex-wrap:wrap;margin-top:.5rem}
-.tl-item{display:flex;align-items:center;gap:.3rem;font-size:.6rem;color:var(--muted)}
+.page-header{
+  padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.25rem 1rem;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;
+}
+.page-header h2{font-family:'Clash Display',sans-serif;font-size:1.4rem;font-weight:700}
+.header-action{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:.4rem .75rem;font-size:.68rem;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Satoshi',sans-serif;transition:all .15s}
+.header-action:hover{color:var(--text)}
+
+.sum-content{flex:1;overflow-y:auto;padding:0 1.25rem}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1rem}
+.stat-card .lbl{font-size:.58rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
+.stat-card .val{font-family:'Clash Display',sans-serif;font-size:1.3rem;font-weight:700;line-height:1}
+.stat-card .sub{font-size:.6rem;color:var(--muted);margin-top:.25rem}
+.stat-card.accent-gold{background:linear-gradient(135deg,var(--gold),#D4922A);border:none}
+.stat-card.accent-gold .lbl,.stat-card.accent-gold .val,.stat-card.accent-gold .sub{color:white}
+.stat-card.accent-gold .lbl,.stat-card.accent-gold .sub{opacity:.8}
+
+/* Chart */
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.1rem;margin-bottom:.75rem}
+.chart-card-title{font-family:'Clash Display',sans-serif;font-size:.85rem;font-weight:600;margin-bottom:.9rem;color:var(--text)}
+.bar-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.65rem}
+.bar-icon{font-size:.9rem;width:24px;text-align:center;flex-shrink:0}
+.bar-name{font-size:.68rem;font-weight:600;width:72px;flex-shrink:0;font-family:'Satoshi',sans-serif}
+.bar-track{flex:1;height:8px;background:var(--card2);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width 1.1s cubic-bezier(.22,1,.36,1)}
+.bar-val{font-size:.65rem;font-weight:700;width:48px;text-align:right;flex-shrink:0;font-family:'Satoshi',sans-serif}
+
+/* Trend */
+.trend-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.1rem;margin-bottom:.75rem}
+.trend-bars{display:flex;align-items:flex-end;gap:.75rem;height:80px;margin-bottom:.5rem;padding-bottom:.25rem;border-bottom:1px solid var(--border)}
+.trend-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:0}
+.trend-inner{display:flex;align-items:flex-end;gap:4px;height:80px}
+.trend-bar{flex:1;min-width:14px;border-radius:4px 4px 0 0;transition:height .9s cubic-bezier(.22,1,.36,1);min-height:3px}
+.trend-lbl{font-size:.58rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.4rem;text-align:center}
+.trend-legend{display:flex;gap:1rem;flex-wrap:wrap}
+.tl-item{display:flex;align-items:center;gap:.35rem;font-size:.62rem;color:var(--muted);font-weight:500}
 .tl-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 
 /* ── BUDGET PAGE ── */
-.budget-content{flex:1;overflow-y:auto;padding:1.2rem 1.5rem}
-.budget-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem}
-.budget-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:.9rem}
-.budget-card.over{border-color:var(--red)}
-.budget-card.warn{border-color:var(--gold)}
-.budget-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.45rem}
-.budget-cat{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700}
-.budget-amts{font-size:.62rem;color:var(--muted)}
-.budget-amts span{color:var(--text);font-weight:600}
-.budget-track{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:.3rem}
+.budget-content{flex:1;overflow-y:auto;padding:0 1.25rem}
+.budget-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1rem;margin-bottom:.6rem}
+.budget-card.over{border-color:var(--red);background:rgba(232,93,61,.04)}
+.budget-card.warn{border-color:var(--gold);background:rgba(232,168,48,.04)}
+.budget-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+.budget-cat{font-family:'Satoshi',sans-serif;font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
+.budget-amts{font-size:.65rem;color:var(--muted)}
+.budget-amts b{color:var(--text);font-weight:700}
+.budget-track{height:6px;background:var(--card2);border-radius:3px;overflow:hidden;margin-bottom:.35rem}
 .budget-bar{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.22,1,.36,1)}
-.budget-status{font-size:.58rem;font-family:'Syne',sans-serif;font-weight:600}
+.budget-status{font-size:.6rem;font-weight:700;font-family:'Satoshi',sans-serif;margin-bottom:.6rem}
 .budget-status.ok{color:var(--green)}.budget-status.warn{color:var(--gold)}.budget-status.over{color:var(--red)}
-.budget-edit-row{display:flex;gap:.35rem;margin-top:.5rem}
-.budget-input{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:.4rem .55rem;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text);outline:none;min-width:0}
-.budget-save{background:var(--accent);color:white;border:none;border-radius:7px;padding:.4rem .75rem;font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer;white-space:nowrap}
+.budget-edit{display:flex;gap:.4rem}
+.budget-input{flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:.45rem .7rem;font-family:'Satoshi',sans-serif;font-size:.75rem;color:var(--text);outline:none;transition:border-color .15s}
+.budget-input:focus{border-color:var(--gold)}
+.budget-save-btn{background:var(--text);color:var(--bg);border:none;border-radius:10px;padding:.45rem .85rem;font-family:'Clash Display',sans-serif;font-size:.7rem;font-weight:600;cursor:pointer;white-space:nowrap}
 
 /* ── SETUP PAGE ── */
-.setup-content{flex:1;overflow-y:auto;padding:1.5rem}
-.setup-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:1.5rem;max-width:560px;margin:0 auto}
-.setup-card h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;margin-bottom:.3rem}
-.setup-card p{font-size:.75rem;color:var(--muted);line-height:1.7;margin-bottom:1.2rem}
-.step{display:flex;gap:.85rem;margin-bottom:1.1rem;align-items:flex-start}
-.step-num{width:26px;height:26px;border-radius:50%;background:var(--accent-glow);border:1.5px solid var(--accent);color:var(--accent);font-family:'Syne',sans-serif;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem}
-.step-body{flex:1}
-.step-body strong{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;display:block;margin-bottom:.2rem}
-.step-body p{font-size:.72rem;color:var(--muted);margin-bottom:.5rem;line-height:1.6}
-.step-body code{background:var(--s3);border:1px solid var(--border);border-radius:5px;padding:.15rem .4rem;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--gold)}
-.url-row{display:flex;gap:.5rem;margin-top:.5rem}
-.url-input{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:.55rem .75rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text);outline:none;transition:border-color .15s}
-.url-input:focus{border-color:var(--accent)}
-.url-input::placeholder{color:var(--muted)}
-.connect-btn{background:var(--accent);color:white;border:none;border-radius:8px;padding:.55rem 1.1rem;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap}
-.disconnect-btn{background:var(--s3);color:var(--red);border:1px solid var(--red);border-radius:8px;padding:.55rem 1rem;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;margin-top:.5rem;width:100%}
-.gs-link{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--accent);text-decoration:none;margin-top:.5rem}
+.setup-content{flex:1;overflow-y:auto;padding:0 1.25rem 1rem}
+.setup-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.1rem;margin-bottom:.75rem}
+.setup-card h3{font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:600;margin-bottom:.3rem}
+.setup-card p{font-size:.72rem;color:var(--muted);line-height:1.6;margin-bottom:.9rem}
+.step{display:flex;gap:.75rem;margin-bottom:.9rem}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--gold);color:white;font-family:'Clash Display',sans-serif;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem}
+.step-body strong{font-family:'Satoshi',sans-serif;font-size:.78rem;font-weight:700;display:block;margin-bottom:.2rem}
+.step-body p{font-size:.7rem;margin-bottom:.4rem}
+.step-body code{background:var(--card2);border:1px solid var(--border);border-radius:5px;padding:.12rem .4rem;font-size:.67rem;color:var(--gold);font-family:monospace}
+.url-row{display:flex;gap:.4rem;margin-top:.4rem}
+.url-input{flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:.55rem .75rem;font-family:'Satoshi',sans-serif;font-size:.72rem;color:var(--text);outline:none;transition:border-color .15s}
+.url-input:focus{border-color:var(--gold)}
+.url-input::placeholder{color:var(--muted2)}
+.connect-btn{background:var(--text);color:var(--bg);border:none;border-radius:10px;padding:.55rem 1rem;font-family:'Clash Display',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.disconnect-btn{width:100%;background:rgba(232,93,61,.1);color:var(--red);border:1px solid var(--red);border-radius:10px;padding:.55rem;font-family:'Satoshi',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;margin-top:.5rem}
+.connected-badge{background:rgba(61,184,122,.1);border:1px solid var(--green);border-radius:10px;padding:.65rem .9rem;font-size:.72rem;color:var(--green);font-weight:700;margin-top:.75rem;display:flex;align-items:center;gap:.4rem}
+.diag-box{background:rgba(232,93,61,.06);border:1px solid var(--red);border-radius:10px;padding:.85rem;margin-top:.75rem;display:none}
+.diag-box .dtitle{font-size:.7rem;font-weight:700;color:var(--red);margin-bottom:.5rem}
+.diag-box .ditem{font-size:.67rem;color:var(--muted);line-height:1.9}
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:90;display:none;align-items:center;justify-content:center;padding:1rem}
-.modal-overlay.open{display:flex}
-.modal{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:1.3rem 1.2rem;width:100%;max-width:440px;animation:popIn .2s ease}
-@keyframes popIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
-.modal-title{font-family:'Syne',sans-serif;font-size:.92rem;font-weight:800;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center}
-.modal-close{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer}
-.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem}
-.modal-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.7rem}
-.modal-btn{padding:.72rem;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer}
-.modal-btn.cancel{background:var(--s3);color:var(--muted)}
-.modal-btn.save{background:var(--accent);color:white}
+/* Cat manager */
+.cat-add-row{display:flex;gap:.4rem;margin-bottom:.75rem;align-items:flex-end;flex-wrap:wrap}
+.icon-btn{width:44px;height:40px;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .15s}
+.icon-btn:focus{border-color:var(--gold);outline:none}
+.icon-grid-wrap{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:.6rem;margin-bottom:.6rem;display:none}
+.icon-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:.25rem}
+.icon-opt{background:none;border:1.5px solid transparent;border-radius:7px;padding:.3rem;font-size:1rem;cursor:pointer;transition:all .1s;line-height:1;aspect-ratio:1}
+.icon-opt.sel{background:rgba(232,168,48,.15);border-color:var(--gold)}
+.cat-item-row{display:flex;align-items:center;gap:.65rem;background:var(--card2);border-radius:12px;padding:.6rem .75rem;margin-bottom:.4rem;border:1px solid var(--border)}
+.cat-item-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.cat-item-name{flex:1;font-weight:700;font-size:.75rem}
+.cat-rm-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.2rem .55rem;font-size:.62rem;cursor:pointer;font-family:'Satoshi',sans-serif;font-weight:600}
 
-/* TOAST */
-.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--green);color:#0a0a0d;padding:.5rem 1.2rem;border-radius:20px;font-size:.72rem;font-weight:700;font-family:'Syne',sans-serif;transition:transform .3s cubic-bezier(.34,1.56,.64,1);z-index:200;white-space:nowrap}
+/* Sync status */
+.sync-pill{display:flex;align-items:center;gap:.35rem;font-size:.6rem;font-weight:700;color:var(--muted);padding:.3rem .6rem;background:var(--card2);border-radius:20px;border:1px solid var(--border)}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.sync-dot.ok{background:var(--green)}.sync-dot.err{background:var(--red)}
+.sync-dot.loading{background:var(--gold);animation:pulse .7s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Theme toggle */
+.theme-toggle{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:.4rem .75rem;font-size:.72rem;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Satoshi',sans-serif;transition:all .15s;white-space:nowrap}
+
+/* Edit sheet */
+.edit-sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.edit-sheet-overlay.open{display:flex}
+.edit-sheet{background:var(--card);border-radius:24px 24px 0 0;padding:0 1.25rem calc(1.5rem + var(--safe-bottom));width:100%;max-width:480px;animation:sheetUp .3s cubic-bezier(.32,1.6,.64,1);max-height:90vh;overflow-y:auto}
+
+/* Toast */
+.toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 1rem);left:50%;transform:translateX(-50%) translateY(-80px);background:var(--text);color:var(--bg);padding:.55rem 1.2rem;border-radius:20px;font-size:.72rem;font-weight:700;font-family:'Satoshi',sans-serif;transition:transform .3s cubic-bezier(.34,1.56,.64,1);z-index:200;white-space:nowrap;letter-spacing:.03em}
 .toast.show{transform:translateX(-50%) translateY(0)}
-.toast.warn{background:var(--gold)}.toast.err{background:var(--red);color:white}
+.toast.warn{background:var(--gold);color:white}
+.toast.err{background:var(--red);color:white}
 
-/* LOADING */
-.loading-overlay{position:fixed;inset:0;background:rgba(10,10,13,.85);z-index:150;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.8rem}
+/* Loading */
+.loading-overlay{position:fixed;inset:0;background:var(--bg);z-index:150;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
 .loading-overlay.hidden{display:none}
-.spinner{width:32px;height:32px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-family:'Syne',sans-serif;font-size:.78rem;color:var(--muted)}
+.loading-text{font-size:.78rem;color:var(--muted);font-weight:600;font-family:'Satoshi',sans-serif}
 
-/* EMPTY */
-.empty{text-align:center;padding:3rem 1.5rem;color:var(--muted)}
-.theme-btn{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:.55rem .8rem;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;text-align:left;margin-bottom:.5rem;transition:all .15s}
-.theme-btn:hover{color:var(--text);border-color:var(--border2)}
-.theme-btn-mobile{background:var(--s2);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:.4rem .7rem;font-size:.9rem;cursor:pointer;flex-shrink:0}
-.empty .emoji{font-size:2.5rem;margin-bottom:.75rem}
-.empty p{font-size:.8rem;line-height:1.8}
+/* Export button */
+.export-btn{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:.4rem .75rem;font-size:.68rem;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Satoshi',sans-serif;transition:all .15s}
 
-/* ── RESPONSIVE ── */
-@media screen and (max-width:768px){
-  .sidebar{display:none}
-  .main{margin-left:0;padding-bottom:calc(110px + env(safe-area-inset-bottom, 0px));width:100%;overflow-x:hidden}
-  .mobile-nav{display:block}
-  .bottom-stats{bottom:56px;display:grid}
-  .desktop-stats{display:none!important}
-  .entries-table{display:none!important}
-  .entries-cards{display:flex}
-  .add-grid{grid-template-columns:1fr}
-  .add-grid.wide{grid-template-columns:1fr}
-  .budget-grid{grid-template-columns:1fr}
-  .sum-grid{grid-template-columns:1fr 1fr}
-  .page-header h2{font-size:1.1rem}
+/* Desktop sidebar layout */
+@media(min-width:769px){
+  .app{flex-direction:row;max-width:100%;margin:0}
+  .desktop-sidebar{width:240px;flex-shrink:0;background:var(--card);border-right:1px solid var(--border);min-height:100vh;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:30;padding:2rem 0;backdrop-filter:blur(20px)}
+  .ds-logo{padding:0 1.5rem 2rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+  .ds-logo h1{font-family:'Clash Display',sans-serif;font-size:1.3rem;font-weight:700;color:var(--text)}
+  .ds-logo p{font-size:.62rem;color:var(--muted);margin-top:.2rem}
+  .ds-nav{flex:1;padding:0 .75rem}
+  .ds-tab{display:flex;align-items:center;gap:.75rem;padding:.75rem .85rem;border-radius:12px;font-family:'Satoshi',sans-serif;font-size:.8rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:.2rem;background:none;border:none;width:100%;text-align:left}
+  .ds-tab:hover{background:var(--card2);color:var(--text)}
+  .ds-tab.active{background:var(--gold);color:white}
+  .ds-tab .ds-icon{font-size:1rem;width:20px;text-align:center}
+  .ds-bottom{padding:.75rem;border-top:1px solid var(--border);margin-top:auto;display:flex;flex-direction:column;gap:.5rem}
+  .main-area{flex:1;margin-left:240px;display:flex;flex-direction:column;min-height:100vh}
+  .bottom-nav{display:none}
+  .page{padding-bottom:0;max-width:720px}
+  .sheet,.edit-sheet{max-width:480px}
+  .home-header{border-radius:0 0 28px 0}
 }
-/* Content max width */
-.page-inner{max-width:1000px;width:100%;margin:0 auto;padding:0}
-.page > .page-header,
-.page > .desktop-stats,
-.page > .month-row,
-.page > .cats,
-.page > .add-section,
-.page > .search-wrap,
-.page > .entries-header{max-width:1000px;width:100%;margin-left:auto;margin-right:auto}
-.entries-wrap{flex:1;overflow-y:auto}
-.entries-wrap table,.entries-wrap .entries-cards{max-width:1000px;margin:0 auto;width:100%}
-.sum-content,.budget-content,.setup-content{max-width:1000px;margin:0 auto;width:100%}
-
-@media screen and (min-width:769px){
-  .bottom-stats{display:none}
-  .mobile-nav{display:none}
-  .desktop-stats{display:flex!important}
-  .entries-table{display:table}
-  .entries-cards{display:none}
-  .add-section{padding:1rem 1.5rem}
-  .add-grid.wide{grid-template-columns:1fr 1fr 1fr 1fr 1fr}
-  .cats{padding:.5rem 1.5rem}
-  .month-tabs{padding:.55rem 1.5rem}
-  .search-wrap{padding:.5rem 1.5rem}
-  .entries-header{padding:.5rem 1.5rem .3rem}
-  .sum-grid{grid-template-columns:repeat(4,1fr)}
-  .budget-grid{grid-template-columns:repeat(3,1fr)}
-  .page-header h2{font-size:1.4rem}
+@media(max-width:768px){
+  .desktop-sidebar{display:none}
+  .main-area{flex:1}
 }
-
-
-
 </style>
 </head>
 <body>
 
 <div class="loading-overlay" id="loadingOverlay">
   <div class="spinner"></div>
-  <div class="loading-text" id="loadingText">Connecting to Google Sheets…</div>
+  <div class="loading-text" id="loadingText">Loading Finlo…</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- EDIT MODAL -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <div class="modal-title">Edit Entry <button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="modal-grid">
-      <div><div class="field-lbl">Amount</div>
-        <div class="amt-wrap"><span class="amt-prefix">₹</span>
-          <input class="field-input amt" type="number" id="editAmt" inputmode="decimal">
-        </div>
+<!-- ADD SHEET -->
+<div class="sheet-overlay" id="addOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">
+      Add Expense
+      <button class="sheet-close" onclick="closeAddSheet()">✕</button>
+    </div>
+    <div class="amt-display">
+      <span class="amt-prefix">₹</span>
+      <input class="amt-input" type="number" id="amtInput" placeholder="0" inputmode="decimal">
+    </div>
+    <div class="field-row">
+      <div class="field-col">
+        <div class="field-lbl">Category</div>
+        <select class="field-ctrl" id="catInput"></select>
       </div>
-      <div><div class="field-lbl">Date</div><input class="field-input" type="date" id="editDate"></div>
-      <div><div class="field-lbl">Category</div>
-        <select class="field-select" id="editCat">
-          <optgroup label="Daily">
-          <option value="Food">🍽 Food</option>
-          <option value="Groceries">🛒 Groceries</option>
-          <option value="Medical">🏥 Medical</option>
-          <option value="Entertainment">🎬 Entertainment</option>
-          <option value="Personal">💆 Personal</option>
-          </optgroup>
-          <optgroup label="Fixed">
-          <option value="Rent">🏠 Rent</option>
-          <option value="EMI">🚗 EMI</option>
-          <option value="Investment">📈 Investment</option>
-          </optgroup>
-          <optgroup label="Variable">
-          <option value="Shopping">🛍 Shopping</option>
-          <option value="Travel">✈ Travel</option>
-          <option value="Fuel">⛽ Fuel</option>
-          <option value="Utilities">💡 Utilities</option>
-          <option value="Gift">🎁 Gift</option>
-          <option value="Misc">📦 Misc</option>
-          </optgroup>
-        </select>
+      <div class="field-col">
+        <div class="field-lbl">Date</div>
+        <input class="field-ctrl" type="date" id="dateInput">
       </div>
-      <div><div class="field-lbl">Payment Source</div>
-        <select class="field-select" id="editSrc">
+    </div>
+    <div class="field-row">
+      <div class="field-col" style="grid-column:1/-1">
+        <div class="field-lbl">Payment Source</div>
+        <select class="field-ctrl" id="srcInput">
           <optgroup label="Credit Cards">
-            <option value="HDFC Regalia CC">💳 HDFC Regalia</option>
-            <option value="ICICI Amazon CC">💳 ICICI Amazon</option>
-            <option value="HDFC Swiggy CC">💳 HDFC Swiggy</option>
-            <option value="Axis Airtel CC">💳 Axis Airtel</option>
+            <option value="HDFC Regalia CC">💳 HDFC Regalia CC</option>
+            <option value="ICICI Amazon CC">💳 ICICI Amazon CC</option>
+            <option value="HDFC Swiggy CC">💳 HDFC Swiggy CC</option>
+            <option value="Axis Airtel CC">💳 Axis Airtel CC</option>
           </optgroup>
           <optgroup label="UPI">
             <option value="UPI – HDFC">📱 UPI – HDFC</option>
@@ -388,336 +403,247 @@ select option{background:#18181f}
         </select>
       </div>
     </div>
-    <div><div class="field-lbl">Note</div><input class="field-input" type="text" id="editNote" placeholder="Optional note…"></div>
-    <div class="modal-btn-row">
-      <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
-      <button class="modal-btn save" onclick="saveEdit()">Save Changes</button>
+    <input class="note-field" type="text" id="noteInput" placeholder="Add a note (optional)…">
+    <button class="submit-btn" onclick="addExpense()">Add Expense</button>
+  </div>
+</div>
+
+<!-- EDIT SHEET -->
+<div class="edit-sheet-overlay" id="editOverlay">
+  <div class="edit-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">
+      Edit Entry
+      <button class="sheet-close" onclick="closeEditSheet()">✕</button>
+    </div>
+    <div class="amt-display">
+      <span class="amt-prefix">₹</span>
+      <input class="amt-input" type="number" id="editAmt" placeholder="0" inputmode="decimal">
+    </div>
+    <div class="field-row">
+      <div class="field-col">
+        <div class="field-lbl">Category</div>
+        <select class="field-ctrl" id="editCat"></select>
+      </div>
+      <div class="field-col">
+        <div class="field-lbl">Date</div>
+        <input class="field-ctrl" type="date" id="editDate">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-col" style="grid-column:1/-1">
+        <div class="field-lbl">Payment Source</div>
+        <select class="field-ctrl" id="editSrc">
+          <optgroup label="Credit Cards">
+            <option value="HDFC Regalia CC">💳 HDFC Regalia CC</option>
+            <option value="ICICI Amazon CC">💳 ICICI Amazon CC</option>
+            <option value="HDFC Swiggy CC">💳 HDFC Swiggy CC</option>
+            <option value="Axis Airtel CC">💳 Axis Airtel CC</option>
+          </optgroup>
+          <optgroup label="UPI">
+            <option value="UPI – HDFC">📱 UPI – HDFC</option>
+            <option value="UPI – Axis/Airtel">📱 UPI – Axis/Airtel</option>
+            <option value="UPI – BoB">📱 UPI – BoB</option>
+            <option value="UPI – DCB">📱 UPI – DCB</option>
+            <option value="UPI – Indian Bank">📱 UPI – Indian Bank</option>
+          </optgroup>
+          <optgroup label="Other"><option value="Cash">💵 Cash</option></optgroup>
+        </select>
+      </div>
+    </div>
+    <input class="note-field" type="text" id="editNote" placeholder="Add a note…">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+      <button class="submit-btn" style="background:var(--card2);color:var(--muted);box-shadow:none" onclick="closeEditSheet()">Cancel</button>
+      <button class="submit-btn" onclick="saveEdit()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- ══ APP SHELL ══ -->
 <div class="app">
-
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-logo">
-      <h1>Expense<br>Tracker</h1>
-      <p>2026 · Priyam</p>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="s-tab active" onclick="showPage('addPage',this)" data-page="addPage">
-        <span class="icon">➕</span> Add Expense
-      </div>
-      <div class="s-tab" onclick="showPage('summaryPage',this)" data-page="summaryPage">
-        <span class="icon">📊</span> Summary
-      </div>
-      <div class="s-tab" onclick="showPage('budgetPage',this)" data-page="budgetPage">
-        <span class="icon">🎯</span> Budget
-      </div>
-      <div class="s-tab" onclick="showPage('setupPage',this)" data-page="setupPage">
-        <span class="icon">⚙️</span> Setup / Sync
-      </div>
+  <!-- DESKTOP SIDEBAR -->
+  <div class="desktop-sidebar">
+    <div class="ds-logo"><h1>Finlo</h1><p>2026 · Priyam</p></div>
+    <nav class="ds-nav">
+      <button class="ds-add-btn" onclick="openAddSheet()">+ Add Expense</button>
+      <button class="ds-tab active" data-page="homePage" onclick="showPage('homePage',this)"><span class="ds-icon">🏠</span>Home</button>
+      <button class="ds-tab" data-page="summaryPage" onclick="showPage('summaryPage',this)"><span class="ds-icon">📊</span>Summary</button>
+      <button class="ds-tab" data-page="budgetPage" onclick="showPage('budgetPage',this)"><span class="ds-icon">🎯</span>Budget</button>
+      <button class="ds-tab" data-page="setupPage" onclick="showPage('setupPage',this)"><span class="ds-icon">⚙️</span>Setup</button>
     </nav>
-    <div class="sidebar-bottom">
-      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙 Dark Mode</button>
-      <div class="sync-status">
-        <div class="sync-dot" id="syncDot"></div>
-        <span id="syncLabel">Not connected</span>
-      </div>
+    <div class="ds-bottom">
+      <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
+      <div class="sync-pill"><div class="sync-dot" id="syncDot"></div><span id="syncLabel">Not connected</span></div>
     </div>
   </div>
 
-  <!-- MAIN -->
-  <div class="main">
-  <div class="content-wrap">
+  <div class="main-area">
 
-    <!-- ══ ADD PAGE ══ -->
-    <div class="page active" id="addPage">
-      <div class="page-header">
-        <div>
-          <h2 id="topMonth">—</h2>
-          <p id="topDate">—</p>
-        </div>
-        <div class="header-right" style="display:flex;align-items:center;gap:.75rem">
-          <button onclick="refreshFromSheet()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:.3rem .6rem;font-size:.7rem;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600" title="Refresh from Google Sheets">↻ Refresh</button>
-          <div>
-            <div class="amt" id="topTotal">₹0</div>
-            <div class="lbl">this month</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Desktop stats -->
-      <div class="desktop-stats" id="desktopStats">
-        <div class="ds-item spend"><div class="ds-val" id="dsSpend">₹0</div><div class="ds-lbl">Spent</div></div>
-        <div class="ds-item invest"><div class="ds-val" id="dsInvest">₹0</div><div class="ds-lbl">Invested</div></div>
-        <div class="ds-item cc"><div class="ds-val" id="dsCC">₹0</div><div class="ds-lbl">CC Swipe</div></div>
-        <div class="ds-item left"><div class="ds-val" id="dsLeft">₹2.5L</div><div class="ds-lbl">Remaining</div></div>
-      </div>
-
-      <div class="month-row">
-        <div class="month-tabs" id="monthTabs"></div>
-        <button class="export-btn" onclick="exportCSV()">↓ All CSV</button>
-      </div>
-
-      <div class="cats" id="catFilter">
-        <div class="cat-pill active" data-cat="All">All</div>
-        <div class="cat-pill" data-cat="Food">🍽 Food</div>
-        <div class="cat-pill" data-cat="Groceries">🛒 Groceries</div>
-        <div class="cat-pill" data-cat="Medical">🏥 Medical</div>
-        <div class="cat-pill" data-cat="Entertainment">🎬 Entertainment</div>
-        <div class="cat-pill" data-cat="Personal">💆 Personal</div>
-        <div class="cat-pill" data-cat="Rent">🏠 Rent</div>
-        <div class="cat-pill" data-cat="EMI">🚗 EMI</div>
-        <div class="cat-pill" data-cat="Shopping">🛍 Shopping</div>
-        <div class="cat-pill" data-cat="Travel">✈ Travel</div>
-        <div class="cat-pill" data-cat="Fuel">⛽ Fuel</div>
-        <div class="cat-pill" data-cat="Utilities">💡 Utilities</div>
-        <div class="cat-pill" data-cat="Gift">🎁 Gift</div>
-        <div class="cat-pill" data-cat="Investment">📈 Investment</div>
-        <div class="cat-pill" data-cat="Misc">📦 Misc</div>
-      </div>
-
-      <!-- Add form -->
-      <div class="add-section">
-        <div class="add-grid wide" id="addGrid">
-          <div>
-            <div class="field-lbl">Amount</div>
-            <div class="amt-wrap"><span class="amt-prefix">₹</span>
-              <input class="field-input amt" type="number" id="amtInput" placeholder="0" inputmode="decimal">
+    <!-- HOME PAGE -->
+    <div class="page active" id="homePage">
+      <div class="home-header">
+        <div class="home-greeting">Good day</div>
+        <div class="home-name">Priyam 👋</div>
+        <div class="balance-card">
+          <div class="balance-lbl">Total Outflow</div>
+          <div class="balance-amt" id="homeTotal">₹0</div>
+          <div class="balance-row">
+            <div class="balance-sub">
+              <div class="balance-sub-lbl">Spent</div>
+              <div class="balance-sub-val neg" id="homeSpent">₹0</div>
+            </div>
+            <div class="balance-sub">
+              <div class="balance-sub-lbl">Invested</div>
+              <div class="balance-sub-val pos" id="homeInvest">₹0</div>
             </div>
           </div>
-          <div>
-            <div class="field-lbl">Category</div>
-            <select class="field-select" id="catInput">
-              <option value="Food">🍽 Food</option><option value="Rent">🏠 Rent</option>
-              <option value="EMI">🚗 EMI</option><option value="Shopping">🛍 Shopping</option>
-              <option value="Travel">✈ Travel</option><option value="Fuel">⛽ Fuel</option>
-              <option value="Utilities">💡 Utilities</option><option value="Gift">🎁 Gift</option>
-              <option value="Investment">📈 Investment</option><option value="Misc">📦 Misc</option>
-            </select>
-          </div>
-          <div>
-            <div class="field-lbl">Payment Source</div>
-            <select class="field-select" id="srcInput">
-              <optgroup label="Credit Cards">
-                <option value="HDFC Regalia CC">💳 HDFC Regalia</option>
-                <option value="ICICI Amazon CC">💳 ICICI Amazon</option>
-                <option value="HDFC Swiggy CC">💳 HDFC Swiggy</option>
-                <option value="Axis Airtel CC">💳 Axis Airtel</option>
-              </optgroup>
-              <optgroup label="UPI">
-                <option value="UPI – HDFC">📱 UPI – HDFC</option>
-                <option value="UPI – Axis/Airtel">📱 UPI – Axis/Airtel</option>
-                <option value="UPI – BoB">📱 UPI – BoB</option>
-                <option value="UPI – DCB">📱 UPI – DCB</option>
-                <option value="UPI – Indian Bank">📱 UPI – Indian Bank</option>
-              </optgroup>
-              <optgroup label="Other"><option value="Cash">💵 Cash</option></optgroup>
-            </select>
-          </div>
-          <div>
-            <div class="field-lbl">Date</div>
-            <input class="field-input" type="date" id="dateInput">
-          </div>
-          <div>
-            <div class="field-lbl">Note</div>
-            <input class="field-input" type="text" id="noteInput" placeholder="Optional…">
-          </div>
-        </div>
-        <div style="margin-top:.6rem">
-          <button class="add-btn" onclick="addExpense()">+ Add Expense</button>
         </div>
       </div>
 
-      <div class="search-wrap">
-        <span class="search-icon">🔍</span>
-        <input class="search-input" type="text" id="searchInput" placeholder="Search by category, source, note…" oninput="renderEntries()">
+      <div class="month-scroll" id="monthTabs"></div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.25rem 1.25rem .1rem">
+        <div class="cat-scroll" id="catFilter" style="padding:0;flex:1"></div>
+        <button class="export-btn" onclick="exportCSV()" style="margin-left:.5rem;flex-shrink:0">↓ CSV</button>
       </div>
 
-      <div class="entries-header">
-        <h3>Entries</h3><span class="entries-count" id="entryCount">0 entries</span>
-      </div>
-
-      <div class="entries-wrap">
-        <!-- Desktop table -->
-        <table class="entries-table" id="entriesTable">
-          <thead>
-            <tr>
-              <th>Category</th><th>Payment Source</th><th>Note</th>
-              <th style="text-align:right">Amount</th><th>Date</th><th style="text-align:right">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="entriesTableBody"></tbody>
-        </table>
-        <!-- Mobile cards -->
-        <div class="entries-cards" id="entriesCards"></div>
+      <div class="entries-section">
+        <div class="section-header">
+          <div class="section-title">Entries</div>
+          <div style="display:flex;align-items:center;gap:.5rem">
+            <span class="section-count" id="entryCount">0 entries</span>
+            <button onclick="refreshFromSheet()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:.2rem .5rem;font-size:.62rem;cursor:pointer;font-family:Satoshi,sans-serif;font-weight:700">↻</button>
+          </div>
+        </div>
+        <div style="margin-bottom:.75rem;position:relative">
+          <input type="text" id="searchInput" oninput="renderEntries()" placeholder="🔍  Search…" style="width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:.6rem .85rem;font-family:Satoshi,sans-serif;font-size:.78rem;color:var(--text);outline:none">
+        </div>
+        <div id="entriesList"></div>
       </div>
     </div>
 
-    <!-- ══ SUMMARY PAGE ══ -->
+    <!-- SUMMARY PAGE -->
     <div class="page" id="summaryPage">
       <div class="page-header">
-        <div><h2>Monthly Summary</h2><p id="sumSubtitle">Overview of your spending</p></div>
+        <h2>Summary</h2>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <div class="sync-pill" style="display:none" id="sumSyncPill"></div>
+        </div>
       </div>
-      <div class="month-row">
-        <div class="month-tabs" id="sumMonthTabs"></div>
-      </div>
+      <div class="month-scroll" id="sumMonthTabs" style="padding-top:.25rem"></div>
       <div class="sum-content">
-        <div class="sum-grid" id="statGrid"></div>
-        <div class="chart-block"><div class="chart-title">Spending by Category</div><div class="bar-chart" id="catBarChart"></div></div>
-        <div class="trend-block">
-          <div class="chart-title">3-Month Trend</div>
+        <div class="stats-grid" id="statGrid" style="margin-top:.75rem"></div>
+        <div class="chart-card"><div class="chart-card-title">Spending by Category</div><div id="catBarChart"></div></div>
+        <div class="trend-card">
+          <div class="chart-card-title">3-Month Trend</div>
           <div class="trend-bars" id="trendBars"></div>
           <div class="trend-legend">
-            <div class="tl-item"><div class="tl-dot" style="background:var(--orange)"></div>Spent</div>
+            <div class="tl-item"><div class="tl-dot" style="background:var(--red)"></div>Spent</div>
             <div class="tl-item"><div class="tl-dot" style="background:var(--green)"></div>Invested</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ══ BUDGET PAGE ══ -->
+    <!-- BUDGET PAGE -->
     <div class="page" id="budgetPage">
       <div class="page-header">
-        <div><h2>Budget Limits</h2><p>Set monthly limits · Alerts at 80% and 100%</p></div>
+        <h2>Budget</h2>
+        <div class="sync-pill"><div class="sync-dot" id="budgetSyncDot"></div><span id="budgetSyncLabel">—</span></div>
       </div>
-      <div class="budget-content">
-        <div class="budget-grid" id="budgetList"></div>
-      </div>
+      <div class="budget-content" id="budgetList"></div>
     </div>
 
-    <!-- ══ SETUP PAGE ══ -->
+    <!-- SETUP PAGE -->
     <div class="page" id="setupPage">
       <div class="page-header">
-        <div><h2>Setup & Sync</h2><p>Connect your Google Sheet</p></div>
-        <button class="theme-btn-mobile" onclick="toggleTheme()" id="themeBtnMobile">🌙</button>
+        <h2>Setup</h2>
+        <div style="display:flex;gap:.5rem">
+          <button class="theme-toggle" id="themeBtnMobile" onclick="toggleTheme()">🌙</button>
+        </div>
       </div>
       <div class="setup-content">
+
         <div class="setup-card">
-          <h3>One-time Google Sheets setup</h3>
-          <p>Follow these steps once. After that, all your expenses sync automatically to your Google Sheet — accessible from any device.</p>
-
-          <div class="step">
-            <div class="step-num">1</div>
-            <div class="step-body">
-              <strong>Create a Google Sheet</strong>
-              <p>Go to <a href="https://sheets.new" target="_blank" class="gs-link">sheets.new</a> and create a new spreadsheet. Name it "Expense Tracker 2026".</p>
+          <h3>Google Sheets Sync</h3>
+          <p>Connect once. All expenses, edits and budgets sync to your sheet automatically from any device.</p>
+          <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Create a Google Sheet</strong><p>Go to <a href="https://sheets.new" target="_blank" style="color:var(--gold)">sheets.new</a> and create a new spreadsheet.</p></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Open Apps Script</strong><p><code>Extensions</code> → <code>Apps Script</code> → paste the <code>apps-script.gs</code> file → Save</p></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Deploy as Web App</strong><p><code>Deploy</code> → <code>New deployment</code> → Web App → Execute as: Me → Access: Anyone → Deploy → copy URL</p></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Paste URL below</strong>
+            <div class="url-row">
+              <input class="url-input" type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
+              <button class="connect-btn" onclick="connectSheet()">Connect</button>
             </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num">2</div>
-            <div class="step-body">
-              <strong>Open Apps Script</strong>
-              <p>In your sheet: <code>Extensions</code> → <code>Apps Script</code>. Delete all existing code.</p>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num">3</div>
-            <div class="step-body">
-              <strong>Paste the script</strong>
-              <p>Copy the contents of <code>apps-script.gs</code> (provided alongside this file) and paste it into the Apps Script editor. Click <code>Save</code> (Ctrl+S).</p>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num">4</div>
-            <div class="step-body">
-              <strong>Deploy as Web App</strong>
-              <p>Click <code>Deploy</code> → <code>New deployment</code> → Type: <code>Web app</code>. Set "Execute as" to <code>Me</code> and "Who has access" to <code>Anyone</code>. Click <code>Deploy</code> and authorize. Copy the Web App URL.</p>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num">5</div>
-            <div class="step-body">
-              <strong>Paste URL below and connect</strong>
-              <div class="url-row">
-                <input class="url-input" type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
-                <button class="connect-btn" onclick="connectSheet()">Connect</button>
-              </div>
-            </div>
-          </div>
-
-          <div id="connectedStatus" style="display:none;margin-top:1rem">
-            <div style="background:rgba(62,207,142,.1);border:1px solid var(--green);border-radius:9px;padding:.75rem 1rem;font-size:.72rem;color:var(--green);font-family:'Syne',sans-serif;font-weight:600">
-              ✓ Connected · Data syncs to Google Sheets
-            </div>
+          </div></div>
+          <div id="connectedStatus" style="display:none">
+            <div class="connected-badge">✓ Connected · syncing to Google Sheets</div>
             <button class="disconnect-btn" onclick="disconnectSheet()">Disconnect</button>
           </div>
-
-          <div id="connDiag" style="display:none;margin-top:1rem;background:rgba(245,108,108,.08);border:1px solid var(--red);border-radius:9px;padding:1rem">
-            <div style="font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;color:var(--red);margin-bottom:.6rem">Connection failed – check these:</div>
-            <div style="font-size:.68rem;color:var(--muted);line-height:2">
-              ✦ Apps Script deployed as <b style="color:var(--text)">Web App</b> (not library)?<br>
-              ✦ "Who has access" set to <b style="color:var(--text)">Anyone</b>?<br>
-              ✦ Did you click <b style="color:var(--text)">New version</b> when redeploying?<br>
-              ✦ URL ends with <b style="color:var(--text)">/exec</b> (not /dev)?<br>
-              ✦ Try opening the URL directly in a new browser tab – should show JSON
+          <div class="diag-box" id="connDiag">
+            <div class="dtitle">Connection failed – check these:</div>
+            <div class="ditem">
+              ✦ Deployed as <b>Web App</b> (not library)?<br>
+              ✦ "Who has access" set to <b>Anyone</b>?<br>
+              ✦ Selected <b>New version</b> when redeploying?<br>
+              ✦ URL ends with <b>/exec</b> (not /dev)?<br>
+              ✦ Open URL in browser tab — should show JSON
             </div>
           </div>
         </div>
 
-        <!-- MANAGE CATEGORIES -->
-        <div class="setup-card" style="margin-top:1rem">
+        <div class="setup-card">
           <h3>Manage Categories</h3>
-          <p>Add custom categories or remove ones you don't use.</p>
-
-          <div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;align-items:flex-end">
-            <div style="flex:1;min-width:120px">
-              <div class="field-lbl">Category Name</div>
-              <input class="url-input" type="text" id="newCatName" placeholder="e.g. Pet Care">
+          <p>Add custom categories with a custom icon and color.</p>
+          <div class="cat-add-row">
+            <div class="field-col" style="flex:1;min-width:100px">
+              <div class="field-lbl">Name</div>
+              <input class="field-ctrl" type="text" id="newCatName" placeholder="e.g. Pet Care">
             </div>
-            <div style="flex:0 0 auto">
+            <div class="field-col">
               <div class="field-lbl">Icon</div>
-              <button type="button" id="iconPickerBtn" onclick="toggleIconPicker()" style="width:52px;height:38px;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center">📦</button>
+              <button type="button" class="icon-btn" id="iconPickerBtn" onclick="toggleIconPicker()">📦</button>
               <input type="hidden" id="newCatIcon" value="📦">
             </div>
-            <div>
+            <div class="field-col">
               <div class="field-lbl">Color</div>
-              <input type="color" id="newCatColor" value="#a0c4ff" style="width:50px;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--s2);cursor:pointer;padding:2px">
+              <input type="color" id="newCatColor" value="#a0c4ff" style="width:44px;height:40px;border:1.5px solid var(--border);border-radius:10px;background:var(--card2);cursor:pointer;padding:2px">
             </div>
-            <button class="connect-btn" onclick="addCustomCat()">+ Add</button>
+            <div class="field-col" style="justify-content:flex-end">
+              <button class="connect-btn" onclick="addCustomCat()" style="height:40px">+ Add</button>
+            </div>
           </div>
-
-          <!-- Icon picker grid -->
-          <div id="iconPickerGrid" style="display:none;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:.6rem;margin-bottom:.75rem">
-            <div style="font-size:.58rem;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">Pick an icon</div>
-            <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:.3rem" id="iconGrid"></div>
+          <div class="icon-grid-wrap" id="iconPickerGrid">
+            <div style="font-size:.58rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Pick an icon</div>
+            <div class="icon-grid" id="iconGrid"></div>
           </div>
+          <div id="catManageList"></div>
+        </div>
 
-          <div id="catManageList" style="display:flex;flex-direction:column;gap:.4rem"></div>
-        </div>
-        </div>
       </div>
     </div>
 
-  </div><!-- /content-wrap -->
-  </div><!-- /main -->
+  </div><!-- /main-area -->
 </div><!-- /app -->
 
-<!-- MOBILE BOTTOM NAV -->
-<div class="mobile-nav">
-  <div class="mobile-nav-inner">
-    <button class="m-tab active" onclick="showPage('addPage',this)" data-page="addPage"><span class="icon">➕</span>Add</button>
-    <button class="m-tab" onclick="showPage('summaryPage',this)" data-page="summaryPage"><span class="icon">📊</span>Summary</button>
-    <button class="m-tab" onclick="showPage('budgetPage',this)" data-page="budgetPage"><span class="icon">🎯</span>Budget</button>
-    <button class="m-tab" onclick="showPage('setupPage',this)" data-page="setupPage"><span class="icon">⚙️</span>Setup</button>
-  </div>
-</div>
-
-<!-- MOBILE BOTTOM STATS -->
-<div class="bottom-stats" id="bottomStats">
-  <div class="bs-item spend"><div class="bs-val" id="bsSpend">₹0</div><div class="bs-lbl">Spent</div></div>
-  <div class="bs-item invest"><div class="bs-val" id="bsInvest">₹0</div><div class="bs-lbl">Invested</div></div>
-  <div class="bs-item cc"><div class="bs-val" id="bsCC">₹0</div><div class="bs-lbl">CC</div></div>
-  <div class="bs-item left"><div class="bs-val" id="bsLeft">₹2.5L</div><div class="bs-lbl">Left</div></div>
-</div>
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav">
+  <button class="nav-item active" data-page="homePage" onclick="showPage('homePage',this)">
+    <span class="nav-icon">🏠</span><span class="nav-label">Home</span>
+  </button>
+  <button class="nav-item" data-page="summaryPage" onclick="showPage('summaryPage',this)">
+    <span class="nav-icon">📊</span><span class="nav-label">Summary</span>
+  </button>
+  <button class="fab" onclick="openAddSheet()">+</button>
+  <button class="nav-item" data-page="budgetPage" onclick="showPage('budgetPage',this)">
+    <span class="nav-icon">🎯</span><span class="nav-label">Budget</span>
+  </button>
+  <button class="nav-item" data-page="setupPage" onclick="showPage('setupPage',this)">
+    <span class="nav-icon">⚙️</span><span class="nav-label">Setup</span>
+  </button>
+</nav>
 
 <script>
+
 // ── CONSTANTS ──
 const INCOME = 250000;
 const CC_SOURCES = ['HDFC Regalia CC','ICICI Amazon CC','HDFC Swiggy CC','Axis Airtel CC'];
@@ -876,38 +802,33 @@ function setSyncStatus(state,label){
 // ── GOOGLE SHEETS API ──
 async function sheetCall(params){
   if(!scriptUrl)return null;
-  const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),12000);
-  // Use GET for reads, POST for writes (avoids URL length/encoding issues)
-  const isWrite = ['add','edit','del'].includes(params.action);
+  const isWrite=['add','edit','del'].includes(params.action);
+  const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),12000));
   try{
-    let r;
+    let fetchPromise;
     if(isWrite){
-      // POST with JSON body - handles special chars, long notes safely
-      r=await fetch(scriptUrl,{
+      fetchPromise=fetch(scriptUrl,{
         method:'POST',
         redirect:'follow',
-        signal:controller.signal,
         headers:{'Content-Type':'application/x-www-form-urlencoded'},
         body:new URLSearchParams(params).toString(),
       });
     } else {
-      // GET for reads
       const url=scriptUrl+'?'+new URLSearchParams(params).toString();
-      r=await fetch(url,{method:'GET',redirect:'follow',signal:controller.signal});
+      fetchPromise=fetch(url,{method:'GET',redirect:'follow'});
     }
-    clearTimeout(timer);
-    if(!r.ok){console.error('Sheet HTTP error:',r.status,r.statusText);return null;}
+    const r=await Promise.race([fetchPromise,timeout]);
+    if(!r.ok){console.error('Sheet HTTP error:',r.status);return null;}
     const respText=await r.text();
     try{return JSON.parse(respText);}
-    catch(e){console.error('Sheet JSON error:',respText.slice(0,300));return null;}
+    catch(e){console.error('Sheet JSON error:',respText.slice(0,200));return null;}
   }catch(e){
-    clearTimeout(timer);
-    if(e.name==='AbortError'){
+    if(e.message==='timeout'){
       setSyncStatus('err','Timeout – check Apps Script');
       showToast('Connection timed out','err');
     } else {
       console.error('Sheet fetch error:',e.message);
+      setSyncStatus('err','Fetch error – '+e.message);
     }
     return null;
   }
@@ -1177,7 +1098,7 @@ async function saveEdit(){
   if(ok){closeModal();renderAll();showToast('✓ Updated')}
   else showToast('Update failed','err');
 }
-document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
+// modalOverlay replaced by editOverlay (handled below)
 
 // ── BUDGET ALERTS ──
 function checkAlerts(mExp){
@@ -1461,11 +1382,7 @@ function showLoading(msg){document.getElementById('loadingText').textContent=msg
 function hideLoading(){document.getElementById('loadingOverlay').classList.add('hidden')}
 
 // ── CAT FILTER ──
-document.getElementById('catFilter').addEventListener('click',e=>{
-  const p=e.target.closest('.cat-pill');if(!p)return;
-  document.querySelectorAll('.cat-pill').forEach(x=>x.classList.remove('active'));
-  p.classList.add('active');activeFilter=p.dataset.cat;renderEntries();
-});
+// catFilter click handled inline in renderCatPills()
 
 // ── INIT ──
 document.getElementById('dateInput').value=new Date().toISOString().split('T')[0];
@@ -1478,6 +1395,335 @@ renderCatPills();
 hideLoading();
 (async()=>{
   await Promise.all([fetchFromSheet(), fetchBudgets()]);
+  activeMonth=getMonths()[0];
+  sumMonth=getMonths()[0];
+  renderAll();
+})();
+
+
+// ── UI OVERRIDES ──
+
+// Page navigation
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item,.ds-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll(`[data-page="${id}"]`).forEach(t=>t.classList.add('active'));
+  if(id==='summaryPage') renderSummary();
+  if(id==='budgetPage') renderBudget();
+  if(id==='setupPage') renderSetup();
+}
+
+// Add/Edit sheets
+function openAddSheet(){ document.getElementById('addOverlay').classList.add('open'); document.getElementById('amtInput').focus(); }
+function closeAddSheet(){ document.getElementById('addOverlay').classList.remove('open'); }
+function closeEditSheet(){ document.getElementById('editOverlay').classList.remove('open'); editingId=null; }
+function closeModal(){ closeEditSheet(); }
+
+// Override openEdit to use new sheet
+function openEdit(id){
+  const e=expenses.find(x=>String(x.id)===String(id));if(!e)return;
+  editingId=String(id);
+  document.getElementById('editAmt').value=e.amt;
+  document.getElementById('editCat').value=e.cat;
+  document.getElementById('editSrc').value=e.src;
+  document.getElementById('editNote').value=e.note||'';
+  document.getElementById('editDate').value=e.date;
+  document.getElementById('editOverlay').classList.add('open');
+}
+
+// Override addExpense to close sheet after
+const _origAdd = addExpense;
+addExpense = async function(){
+  const amt=parseFloat(document.getElementById('amtInput').value);
+  const cat=document.getElementById('catInput').value;
+  const src=document.getElementById('srcInput').value;
+  const note=document.getElementById('noteInput').value.trim();
+  const rawDate=document.getElementById('dateInput').value;
+  const date=toISODate(rawDate);
+  if(!amt||amt<=0){document.getElementById('amtInput').focus();return}
+  if(!date){showToast('Pick a date','warn');return}
+  const entry={id:String(Date.now()),amt,cat,src,note,date};
+  const ok=await addToSheet(entry);
+  if(!ok){return;}
+  document.getElementById('amtInput').value='';
+  document.getElementById('noteInput').value='';
+  activeMonth=date.slice(0,7);
+  closeAddSheet();
+  renderAll();
+  showToast(`✓ ₹${amt.toLocaleString('en-IN')} · ${cat}`);
+};
+
+// Overlay close on backdrop click
+document.getElementById('addOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeAddSheet()});
+document.getElementById('editOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeEditSheet()});
+
+// Override renderAll for new UI
+function renderAll(){
+  const now=new Date();
+  const[y,mo]=activeMonth.split('-');
+  document.getElementById('topMonth')&&(document.getElementById('topMonth').textContent=new Date(y,mo-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'}));
+  renderCatDropdowns();
+  renderCatPills();
+  renderMonthTabs();
+  renderEntries();
+  renderHomeStats();
+}
+
+function renderHomeStats(){
+  const mExp=expenses.filter(e=>e.date.startsWith(activeMonth));
+  const spend=mExp.filter(e=>e.cat!=='Investment').reduce((s,e)=>s+e.amt,0);
+  const invest=mExp.filter(e=>e.cat==='Investment').reduce((s,e)=>s+e.amt,0);
+  const el=id=>document.getElementById(id);
+  if(el('homeTotal')) el('homeTotal').textContent=fmt(spend+invest);
+  if(el('homeSpent')) el('homeSpent').textContent=fmt(spend);
+  if(el('homeInvest')) el('homeInvest').textContent=fmt(invest);
+}
+
+// Override renderMonthTabs
+function renderMonthTabs(){
+  const months=getMonths();
+  const html=months.map(m=>{
+    const[y,mo]=m.split('-');
+    const l=new Date(y,mo-1,1).toLocaleDateString('en-IN',{month:'short',year:'2-digit'});
+    return `<button class="month-chip ${m===activeMonth?'active':''}" onclick="setMonth('${m}')">${l}</button>`;
+  }).join('');
+  ['monthTabs','sumMonthTabs'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.innerHTML=html;
+  });
+}
+
+// Override renderCatPills
+function renderCatPills(){
+  const el=document.getElementById('catFilter');
+  if(!el) return;
+  const active=activeFilter;
+  el.innerHTML=`<button class="cat-pill ${active==='All'?'active':''}" data-cat="All">All</button>`+
+    CATS.map(cat=>`<button class="cat-pill ${active===cat?'active':''}" data-cat="${cat}">${CAT_ICONS[cat]||'📦'} ${cat}</button>`).join('');
+  el.onclick=ev=>{
+    const p=ev.target.closest('.cat-pill');if(!p)return;
+    document.querySelectorAll('.cat-pill').forEach(x=>x.classList.remove('active'));
+    p.classList.add('active');activeFilter=p.dataset.cat;renderEntries();
+  };
+}
+
+// Override renderEntries for new card style
+function renderEntries(){
+  const q=document.getElementById('searchInput')?.value.toLowerCase().trim()||'';
+  const mExp=expenses.filter(e=>e.date.startsWith(activeMonth));
+  let filt=activeFilter==='All'?mExp:mExp.filter(e=>e.cat===activeFilter);
+  if(q) filt=filt.filter(e=>(e.cat+e.src+(e.note||'')).toLowerCase().includes(q));
+
+  const cc=mExp.filter(e=>CC_SOURCES.includes(e.src)&&e.cat!=='Investment').reduce((s,e)=>s+e.amt,0);
+  document.getElementById('entryCount').textContent=filt.length+(filt.length===1?' entry':' entries');
+  renderHomeStats();
+
+  const list=document.getElementById('entriesList');
+  if(!filt.length){
+    list.innerHTML=`<div class="empty-state"><span class="empty-emoji">📭</span><p class="empty-text">${q?'No results found.':'No entries yet.<br>Tap + to add your first expense.'}</p></div>`;
+    return;
+  }
+
+  const byD={};
+  filt.forEach(e=>{(byD[e.date]=byD[e.date]||[]).push(e)});
+
+  list.innerHTML=Object.keys(byD).sort().reverse().map(date=>{
+    const dt=byD[date].reduce((s,e)=>s+e.amt,0);
+    const items=byD[date].sort((a,b)=>String(b.id).localeCompare(String(a.id))).map(e=>`
+      <div class="entry-card" onclick="openEdit('${e.id}')">
+        <div class="entry-icon-wrap" style="background:${CAT_COLORS[e.cat]||'#888'}22">
+          <span style="font-size:1.1rem">${CAT_ICONS[e.cat]||'📦'}</span>
+        </div>
+        <div class="entry-body">
+          <div class="entry-cat" style="color:${CAT_COLORS[e.cat]||'#888'}">${e.cat}</div>
+          <div class="entry-meta">
+            <span>${e.src}</span>
+            ${e.note?`<span class="entry-src-dot"></span><span>${e.note}</span>`:''}
+          </div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-amt">${fmtFull(e.amt)}</div>
+          <div class="entry-date">${fmtDate(e.date)}</div>
+        </div>
+      </div>`).join('');
+    return `<div class="day-group">
+      <div class="day-label"><span>${fmtDate(date)}</span><span class="day-total">${fmt(dt)}</span></div>
+      ${items}
+    </div>`;
+  }).join('');
+}
+
+// Override setSyncStatus
+function setSyncStatus(state,label){
+  ['syncDot','budgetSyncDot'].forEach(id=>{
+    const d=document.getElementById(id);
+    if(d) d.className='sync-dot '+(state==='ok'?'ok':state==='loading'?'loading':'err');
+  });
+  ['syncLabel','budgetSyncLabel'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=label;
+  });
+}
+
+// Override renderSummary
+function renderSummary(){
+  renderMonthTabs();
+  const mExp=expenses.filter(e=>e.date.startsWith(sumMonth));
+  const spend=mExp.filter(e=>e.cat!=='Investment').reduce((s,e)=>s+e.amt,0);
+  const invest=mExp.filter(e=>e.cat==='Investment').reduce((s,e)=>s+e.amt,0);
+  const cc=mExp.filter(e=>CC_SOURCES.includes(e.src)&&e.cat!=='Investment').reduce((s,e)=>s+e.amt,0);
+  const[y,mo]=sumMonth.split('-');
+  const mName=new Date(y,mo-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+
+  document.getElementById('statGrid').innerHTML=`
+    <div class="stat-card accent-gold">
+      <div class="lbl">Total Spent</div>
+      <div class="val">${fmt(spend)}</div>
+      <div class="sub">${mExp.length} transactions</div>
+    </div>
+    <div class="stat-card">
+      <div class="lbl">Invested</div>
+      <div class="val" style="color:var(--green)">${fmt(invest)}</div>
+      <div class="sub">${Math.round(invest/((spend+invest)||1)*100)}% of outflow</div>
+    </div>
+    <div class="stat-card">
+      <div class="lbl">CC Swipe</div>
+      <div class="val" style="color:var(--blue)">${fmt(cc)}</div>
+      <div class="sub">Credit cards</div>
+    </div>
+    <div class="stat-card">
+      <div class="lbl">Remaining</div>
+      <div class="val" style="color:var(--green)">${fmt(Math.max(0,INCOME-spend-invest))}</div>
+      <div class="sub">of ₹2.5L income</div>
+    </div>`;
+
+  const catT=CATS.filter(c=>c!=='Investment')
+    .map(cat=>({cat,amt:mExp.filter(e=>e.cat===cat).reduce((s,e)=>s+e.amt,0)}))
+    .filter(x=>x.amt>0).sort((a,b)=>b.amt-a.amt);
+  const mx=catT[0]?.amt||1;
+  document.getElementById('catBarChart').innerHTML=catT.map(({cat,amt})=>`
+    <div class="bar-row">
+      <span class="bar-icon">${CAT_ICONS[cat]||'📦'}</span>
+      <span class="bar-name">${cat}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:0%;background:${CAT_COLORS[cat]||'#888'}" data-w="${Math.round(amt/mx*100)}"></div></div>
+      <span class="bar-val">${fmt(amt)}</span>
+    </div>`).join('');
+
+  const tm=getMonths().slice(0,3).reverse();
+  const mxS=Math.max(...tm.map(m=>expenses.filter(e=>e.date.startsWith(m)&&e.cat!=='Investment').reduce((s,e)=>s+e.amt,0)),1);
+  document.getElementById('trendBars').innerHTML=tm.map(m=>{
+    const[y2,mo2]=m.split('-');
+    const l=new Date(y2,mo2-1,1).toLocaleDateString('en-IN',{month:'short'});
+    const me=expenses.filter(e=>e.date.startsWith(m));
+    const sp=me.filter(e=>e.cat!=='Investment').reduce((s,e)=>s+e.amt,0);
+    const inv=me.filter(e=>e.cat==='Investment').reduce((s,e)=>s+e.amt,0);
+    return `<div class="trend-group">
+      <div class="trend-inner">
+        <div class="trend-bar" style="background:var(--red);height:0" data-h="${Math.round(sp/mxS*75)}"></div>
+        <div class="trend-bar" style="background:var(--green);height:0" data-h="${Math.round(inv/mxS*75)}"></div>
+      </div>
+      <div class="trend-lbl">${l}</div>
+    </div>`;
+  }).join('');
+
+  setTimeout(()=>{
+    document.querySelectorAll('.bar-fill[data-w]').forEach(el=>{el.style.transition='width 1.1s cubic-bezier(.22,1,.36,1)';el.style.width=el.dataset.w+'%'});
+    document.querySelectorAll('.trend-bar[data-h]').forEach(el=>{el.style.transition='height .9s cubic-bezier(.22,1,.36,1)';el.style.height=el.dataset.h+'px'});
+  },60);
+}
+function setSumMonth(m){sumMonth=m;renderSummary()}
+function setMonth(m){activeMonth=m;renderAll()}
+
+// Override renderBudget
+function renderBudget(){
+  const mExp=expenses.filter(e=>e.date.startsWith(getCurrentMonth()));
+  document.getElementById('budgetList').innerHTML=CATS.filter(c=>c!=='Investment').map(cat=>{
+    const sp=mExp.filter(e=>e.cat===cat).reduce((s,e)=>s+e.amt,0);
+    const lim=budgets[cat]||0;
+    const pct=lim?Math.min(sp/lim,1):0;
+    const over=lim&&sp>lim,warn2=lim&&!over&&sp/lim>=.8;
+    const bc=over?'var(--red)':warn2?'var(--gold)':CAT_COLORS[cat]||'#888';
+    const sc=over?'over':warn2?'warn':'ok';
+    const st=over?`Over by ${fmt(sp-lim)}`:warn2?`${Math.round(sp/lim*100)}% used`:`${fmt(lim-sp)} left`;
+    return `<div class="budget-card ${over?'over':warn2?'warn':''}">
+      <div class="budget-top">
+        <div class="budget-cat">${CAT_ICONS[cat]||'📦'} ${cat}</div>
+        <div class="budget-amts"><b>${fmt(sp)}</b> / ${lim?fmt(lim):'no limit'}</div>
+      </div>
+      <div class="budget-track"><div class="budget-bar" style="width:${Math.round(pct*100)}%;background:${bc}"></div></div>
+      <div class="budget-status ${sc}">${lim?st:'Set a monthly limit below'}</div>
+      <div class="budget-edit">
+        <input class="budget-input" type="number" id="bl_${cat.replace(/\s/g,'_')}" value="${lim||''}" placeholder="Monthly limit…" inputmode="numeric">
+        <button class="budget-save-btn" onclick="saveBudget('${cat}')">Save</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Fix saveBudget to use underscore IDs
+const _origSaveBudget=saveBudget;
+saveBudget=async function(cat){
+  const elId='bl_'+cat.replace(/\s/g,'_');
+  const el=document.getElementById(elId);
+  if(!el)return;
+  const v=parseFloat(el.value);
+  if(!v||v<=0){showToast('Enter a valid amount','warn');return}
+  showToast('Saving…','warn');
+  const ok=await syncBudgetToSheet(cat,v);
+  if(ok){renderBudget();showToast(`✓ ${cat} → ${fmt(v)}/mo`);}
+};
+
+// Override renderSetup
+function renderSetup(){
+  const inp=document.getElementById('scriptUrlInput');
+  const status=document.getElementById('connectedStatus');
+  if(scriptUrl){inp.value=scriptUrl;status.style.display='block';}
+  else status.style.display='none';
+  renderCatManageList();
+}
+
+// Override renderCatManageList
+function renderCatManageList(){
+  const el=document.getElementById('catManageList');if(!el)return;
+  const saved=localStorage.getItem('custom_cats');
+  const custom=saved?JSON.parse(saved):[];
+  if(!custom.length){
+    el.innerHTML=`<div style="font-size:.68rem;color:var(--muted);padding:.25rem 0">No custom categories yet.</div>`;
+    return;
+  }
+  el.innerHTML=custom.map(c=>`
+    <div class="cat-item-row">
+      <div class="cat-item-icon" style="background:${c.color}22;color:${c.color}">${c.icon}</div>
+      <div class="cat-item-name">${c.name}</div>
+      <button class="cat-rm-btn" onclick="deleteCustomCat('${c.name}')">Remove</button>
+    </div>`).join('');
+}
+
+// Override applyTheme
+function applyTheme(theme){
+  if(theme==='dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+    ['themeBtn','themeBtnMobile'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=el.id==='themeBtn'?'☀️ Light':'☀️';}});
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    ['themeBtn','themeBtnMobile'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=el.id==='themeBtn'?'🌙 Dark':'🌙';}});
+  }
+  localStorage.setItem('theme',theme);
+}
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  applyTheme(cur==='dark'?'light':'dark');
+}
+
+// INIT
+document.getElementById('dateInput').value=new Date().toISOString().split('T')[0];
+applyTheme(localStorage.getItem('theme')||'light');
+renderCatDropdowns();
+renderCatPills();
+hideLoading();
+(async()=>{
+  await Promise.all([fetchFromSheet(),fetchBudgets()]);
   activeMonth=getMonths()[0];
   sumMonth=getMonths()[0];
   renderAll();
