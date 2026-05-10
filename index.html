@@ -407,6 +407,12 @@ select.field-ctrl option{background:var(--card)}
       </div>
     </div>
     <input class="note-field" type="text" id="noteInput" placeholder="Add a note (optional)…">
+    <div class="field-row" style="margin-bottom:.75rem">
+      <div class="field-col" style="grid-column:1/-1">
+        <div class="field-lbl">Tags (optional — e.g. work trip, wedding)</div>
+        <input class="field-ctrl" type="text" id="tagInput" placeholder="e.g. Goa Trip, Wedding Season">
+      </div>
+    </div>
     <button class="submit-btn" onclick="addExpense()">Add Expense</button>
   </div>
 </div>
@@ -458,6 +464,12 @@ select.field-ctrl option{background:var(--card)}
       </div>
     </div>
     <input class="note-field" type="text" id="editNote" placeholder="Add a note…">
+    <div class="field-row" style="margin-bottom:.75rem">
+      <div class="field-col" style="grid-column:1/-1">
+        <div class="field-lbl">Tags</div>
+        <input class="field-ctrl" type="text" id="editTag" placeholder="e.g. Goa Trip, Wedding Season">
+      </div>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
       <button class="submit-btn" style="background:var(--card2);color:var(--muted);box-shadow:none" onclick="closeEditSheet()">Cancel</button>
       <button class="submit-btn" onclick="saveEdit()">Save</button>
@@ -474,6 +486,10 @@ select.field-ctrl option{background:var(--card)}
       <button class="ds-tab active" data-page="homePage" onclick="showPage('homePage',this)"><span class="ds-icon">🏠</span>Home</button>
       <button class="ds-tab" data-page="summaryPage" onclick="showPage('summaryPage',this)"><span class="ds-icon">📊</span>Summary</button>
       <button class="ds-tab" data-page="budgetPage" onclick="showPage('budgetPage',this)"><span class="ds-icon">🎯</span>Budget</button>
+      <button class="ds-tab" data-page="insightsPage" onclick="showPage('insightsPage',this)"><span class="ds-icon">💡</span>Insights</button>
+      <button class="ds-tab" data-page="recurringPage" onclick="showPage('recurringPage',this)"><span class="ds-icon">🔁</span>Recurring</button>
+      <button class="ds-tab" data-page="incomePage" onclick="showPage('incomePage',this)"><span class="ds-icon">💰</span>Income</button>
+      <button class="ds-tab" data-page="emiPage" onclick="showPage('emiPage',this)"><span class="ds-icon">🏦</span>EMIs</button>
       <button class="ds-tab" data-page="setupPage" onclick="showPage('setupPage',this)"><span class="ds-icon">⚙️</span>Setup</button>
     </nav>
     <div class="ds-bottom">
@@ -628,6 +644,101 @@ select.field-ctrl option{background:var(--card)}
       </div>
     </div>
 
+
+    <!-- INSIGHTS PAGE -->
+    <div class="page" id="insightsPage">
+      <div class="page-header"><h2>Insights</h2>
+        <button class="header-action" onclick="copyMonthReport()">📋 Copy Report</button>
+      </div>
+      <div class="sum-content" id="insightsContent" style="padding-bottom:1rem"></div>
+    </div>
+
+    <!-- RECURRING PAGE -->
+    <div class="page" id="recurringPage">
+      <div class="page-header"><h2>Recurring</h2></div>
+      <div class="sum-content">
+        <div class="chart-card">
+          <div class="chart-card-title">Add Recurring Entry</div>
+          <div class="field-row">
+            <div class="field-col"><div class="field-lbl">Name</div><input class="field-ctrl" type="text" id="recName" placeholder="e.g. Car EMI"></div>
+            <div class="field-col"><div class="field-lbl">Amount</div><input class="field-ctrl" type="number" id="recAmt" placeholder="0" inputmode="decimal"></div>
+          </div>
+          <div class="field-row">
+            <div class="field-col"><div class="field-lbl">Category</div><select class="field-ctrl" id="recCat"></select></div>
+            <div class="field-col"><div class="field-lbl">Day of Month</div><input class="field-ctrl" type="number" id="recDay" placeholder="1-28" min="1" max="28" value="1"></div>
+          </div>
+          <div class="field-col" style="margin-bottom:.75rem"><div class="field-lbl">Payment Source</div>
+            <select class="field-ctrl" id="recSrc">
+              <option value="UPI – HDFC">📱 UPI – HDFC</option>
+              <option value="HDFC Regalia CC">💳 HDFC Regalia CC</option>
+              <option value="ICICI Amazon CC">💳 ICICI Amazon CC</option>
+              <option value="Axis Airtel CC">💳 Axis Airtel CC</option>
+              <option value="UPI – BoB">📱 UPI – BoB</option>
+              <option value="Cash">💵 Cash</option>
+            </select>
+          </div>
+          <button class="submit-btn" onclick="addRecurring()">+ Add Recurring</button>
+        </div>
+        <div id="recurringList"></div>
+        <div class="chart-card" style="margin-top:.5rem">
+          <div class="chart-card-title">Due This Month</div>
+          <div id="recurringDue"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INCOME PAGE -->
+    <div class="page" id="incomePage">
+      <div class="page-header"><h2>Income</h2>
+        <div style="text-align:right"><div style="font-family:'Clash Display',sans-serif;font-size:1.1rem;font-weight:700;color:var(--green)" id="incomeTotal">₹0</div><div style="font-size:.6rem;color:var(--muted)">this month</div></div>
+      </div>
+      <div class="sum-content">
+        <div class="chart-card">
+          <div class="chart-card-title">Log Income</div>
+          <div class="field-row">
+            <div class="field-col"><div class="field-lbl">Amount</div><input class="field-ctrl" type="number" id="incAmt" placeholder="0" inputmode="decimal"></div>
+            <div class="field-col"><div class="field-lbl">Date</div><input class="field-ctrl" type="date" id="incDate"></div>
+          </div>
+          <div class="field-col" style="margin-bottom:.75rem"><div class="field-lbl">Source</div>
+            <select class="field-ctrl" id="incSrc">
+              <option value="Salary">💼 Salary</option>
+              <option value="Freelance">💻 Freelance</option>
+              <option value="Rental">🏠 Rental</option>
+              <option value="Investment Returns">📈 Investment Returns</option>
+              <option value="Bonus">🎯 Bonus</option>
+              <option value="Other">📦 Other</option>
+            </select>
+          </div>
+          <button class="submit-btn" onclick="addIncomeEntry()">+ Log Income</button>
+        </div>
+        <div id="incomeList" style="margin-top:.5rem"></div>
+      </div>
+    </div>
+
+    <!-- EMI PAGE -->
+    <div class="page" id="emiPage">
+      <div class="page-header"><h2>EMI Tracker</h2></div>
+      <div class="sum-content">
+        <div class="chart-card">
+          <div class="chart-card-title">Add Loan / EMI</div>
+          <div class="field-row">
+            <div class="field-col"><div class="field-lbl">Loan Name</div><input class="field-ctrl" type="text" id="emiName" placeholder="e.g. Car Loan"></div>
+            <div class="field-col"><div class="field-lbl">Principal (₹)</div><input class="field-ctrl" type="number" id="emiPrincipal" placeholder="0" inputmode="decimal"></div>
+          </div>
+          <div class="field-row">
+            <div class="field-col"><div class="field-lbl">Monthly EMI (₹)</div><input class="field-ctrl" type="number" id="emiAmt" placeholder="0" inputmode="decimal"></div>
+            <div class="field-col"><div class="field-lbl">Total Months</div><input class="field-ctrl" type="number" id="emiMonths" placeholder="36" inputmode="numeric"></div>
+          </div>
+          <div class="field-row">
+            <div class="field-col"><div class="field-lbl">Start Date</div><input class="field-ctrl" type="date" id="emiStart"></div>
+            <div class="field-col"><div class="field-lbl">Interest Rate (%)</div><input class="field-ctrl" type="number" id="emiRate" placeholder="8.5" step="0.1"></div>
+          </div>
+          <button class="submit-btn" style="margin-top:.5rem" onclick="addEmiEntry()">+ Add EMI</button>
+        </div>
+        <div id="emiList" style="margin-top:.5rem"></div>
+      </div>
+    </div>
+
   </div><!-- /main-area -->
 </div><!-- /app -->
 
@@ -640,11 +751,11 @@ select.field-ctrl option{background:var(--card)}
     <span class="nav-icon">📊</span><span class="nav-label">Summary</span>
   </button>
   <button class="fab" onclick="openAddSheet()">+</button>
-  <button class="nav-item" data-page="budgetPage" onclick="showPage('budgetPage',this)">
-    <span class="nav-icon">🎯</span><span class="nav-label">Budget</span>
+  <button class="nav-item" data-page="insightsPage" onclick="showPage('insightsPage',this)">
+    <span class="nav-icon">💡</span><span class="nav-label">Insights</span>
   </button>
-  <button class="nav-item" data-page="setupPage" onclick="showPage('setupPage',this)">
-    <span class="nav-icon">⚙️</span><span class="nav-label">Setup</span>
+  <button class="nav-item" data-page="budgetPage" onclick="showPage('budgetPage',this)">
+    <span class="nav-icon">⚙️</span><span class="nav-label">More</span>
   </button>
 </nav>
 
@@ -747,6 +858,10 @@ let activeFilter = 'All';
 let sumMonth     = getCurrentMonth();
 let editingId    = null;
 let syncing      = false;
+let recurring    = [];
+let income       = [];
+let emis         = [];
+let tags         = JSON.parse(localStorage.getItem('tags_v1')||'[]');
 
 // ── HELPERS ──
 // Convert any date format to YYYY-MM-DD
@@ -863,6 +978,14 @@ async function fetchFromSheet(){
 
 async function addToSheet(entry){
   if(!scriptUrl){showToast('Not connected to Google Sheets','err');return false;}
+  // Check for unusual spend
+  if(entry.cat!=='Investment'){
+    const catExps=expenses.filter(e=>e.cat===entry.cat);
+    if(catExps.length>=3){
+      const avg=catExps.reduce((s,e)=>s+e.amt,0)/catExps.length;
+      if(entry.amt>avg*2.5) showToast(`⚠ Unusual: ${entry.cat} avg is ${fmt(avg)}`,'warn');
+    }
+  }
   // Optimistic update - add to UI instantly
   expenses.unshift(entry);
   setSyncStatus('loading','Syncing…');
@@ -1088,7 +1211,8 @@ async function addExpense(){
   const date=toISODate(rawDate);
   if(!amt||amt<=0){document.getElementById('amtInput').focus();return}
   if(!date){showToast('Pick a date','warn');return}
-  const entry={id:String(Date.now()),amt,cat,src,note,date};
+  const tags=(document.getElementById('tagInput')?.value||'').trim();
+  const entry={id:String(Date.now()),amt,cat,src,note,date,tags};
   const ok=await addToSheet(entry);
   if(!ok){showToast('Failed to save','err');return}
   document.getElementById('amtInput').value='';
@@ -1124,7 +1248,8 @@ async function saveEdit(){
   const rawDate=document.getElementById('editDate').value;
   const date=toISODate(rawDate);
   if(!date){showToast('Invalid date','warn');return;}
-  const entry={id:editingId,amt,cat:document.getElementById('editCat').value,src:document.getElementById('editSrc').value,note:document.getElementById('editNote').value.trim(),date};
+  const tags=(document.getElementById('editTag')?.value||'').trim();
+  const entry={id:editingId,amt,cat:document.getElementById('editCat').value,src:document.getElementById('editSrc').value,note:document.getElementById('editNote').value.trim(),date,tags};
   // Close instantly, sync in background
   closeModal();
   const ok=await editInSheet(entry);
@@ -1145,7 +1270,7 @@ function checkAlerts(mExp){
 
 // ── SUMMARY ──
 function renderSummary(){
-  renderMonthTabs();
+  renderMonthTabs(); // re-renders sumMonthTabs with correct sumMonth active
   const mExp=expenses.filter(e=>e.date.startsWith(sumMonth));
   const spend=mExp.filter(e=>e.cat!=='Investment').reduce((s,e)=>s+e.amt,0);
   const invest=mExp.filter(e=>e.cat==='Investment').reduce((s,e)=>s+e.amt,0);
@@ -1467,6 +1592,7 @@ function openEdit(id){
   document.getElementById('editSrc').value=e.src;
   document.getElementById('editNote').value=e.note||'';
   document.getElementById('editDate').value=e.date;
+  if(document.getElementById('editTag')) document.getElementById('editTag').value=e.tags||'';
   document.getElementById('editOverlay').classList.add('open');
 }
 
@@ -1481,11 +1607,13 @@ addExpense = async function(){
   const date=toISODate(rawDate);
   if(!amt||amt<=0){document.getElementById('amtInput').focus();return}
   if(!date){showToast('Pick a date','warn');return}
-  const entry={id:String(Date.now()),amt,cat,src,note,date};
+  const tags=(document.getElementById('tagInput')?.value||'').trim();
+  const entry={id:String(Date.now()),amt,cat,src,note,date,tags};
   const ok=await addToSheet(entry);
   if(!ok){return;}
   document.getElementById('amtInput').value='';
   document.getElementById('noteInput').value='';
+  if(document.getElementById('tagInput')) document.getElementById('tagInput').value='';
   activeMonth=date.slice(0,7);
   closeAddSheet();
   renderAll();
@@ -1521,15 +1649,20 @@ function renderHomeStats(){
 // Override renderMonthTabs
 function renderMonthTabs(){
   const months=getMonths();
-  const html=months.map(m=>{
+  const homeHtml=months.map(m=>{
     const[y,mo]=m.split('-');
     const l=new Date(y,mo-1,1).toLocaleDateString('en-IN',{month:'short',year:'2-digit'});
     return `<button class="month-chip ${m===activeMonth?'active':''}" onclick="setMonth('${m}')">${l}</button>`;
   }).join('');
-  ['monthTabs','sumMonthTabs'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.innerHTML=html;
-  });
+  const sumHtml=months.map(m=>{
+    const[y,mo]=m.split('-');
+    const l=new Date(y,mo-1,1).toLocaleDateString('en-IN',{month:'short',year:'2-digit'});
+    return `<button class="month-chip ${m===sumMonth?'active':''}" onclick="setSumMonth('${m}')">${l}</button>`;
+  }).join('');
+  const homeEl=document.getElementById('monthTabs');
+  const sumEl=document.getElementById('sumMonthTabs');
+  if(homeEl) homeEl.innerHTML=homeHtml;
+  if(sumEl) sumEl.innerHTML=sumHtml;
 }
 
 // Override renderCatPills
@@ -1578,6 +1711,7 @@ function renderEntries(){
           <div class="entry-meta">
             <span>${e.src}</span>
             ${e.note?`<span class="entry-src-dot"></span><span>${e.note}</span>`:''}
+            ${e.tags?`<span class="entry-src-dot"></span><span style="color:var(--gold)">🏷 ${e.tags}</span>`:''}
           </div>
         </div>
         <div class="entry-right">
@@ -1606,7 +1740,7 @@ function setSyncStatus(state,label){
 
 // Override renderSummary
 function renderSummary(){
-  renderMonthTabs();
+  renderMonthTabs(); // re-renders sumMonthTabs with correct sumMonth active
   const mExp=expenses.filter(e=>e.date.startsWith(sumMonth));
   const spend=mExp.filter(e=>e.cat!=='Investment').reduce((s,e)=>s+e.amt,0);
   const invest=mExp.filter(e=>e.cat==='Investment').reduce((s,e)=>s+e.amt,0);
@@ -1785,17 +1919,411 @@ function toggleTheme(){
   applyTheme(cur==='dark'?'light':'dark');
 }
 
-// INIT
+
+// ── RECURRING ──
+async function fetchRecurring(){
+  if(!scriptUrl)return;
+  const res=await sheetCall({action:'getRecurring'});
+  if(res&&res.recurring) recurring=res.recurring;
+}
+async function addRecurring(){
+  const name=document.getElementById('recName').value.trim();
+  const amt=parseFloat(document.getElementById('recAmt').value);
+  const cat=document.getElementById('recCat').value;
+  const src=document.getElementById('recSrc').value;
+  const day=parseInt(document.getElementById('recDay').value)||1;
+  if(!name||!amt){showToast('Fill name and amount','warn');return;}
+  const entry={id:String(Date.now()),name,cat,src,amt,day};
+  recurring.push(entry);
+  if(scriptUrl) sheetCall({action:'saveRecurring',data:JSON.stringify(recurring)});
+  document.getElementById('recName').value='';
+  document.getElementById('recAmt').value='';
+  renderRecurring();
+  showToast('✓ Recurring added');
+}
+async function deleteRecurring(id){
+  recurring=recurring.filter(r=>r.id!==id);
+  if(scriptUrl) sheetCall({action:'saveRecurring',data:JSON.stringify(recurring)});
+  renderRecurring();
+  showToast('✓ Removed');
+}
+async function applyRecurring(r){
+  const today=new Date();
+  const dateStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(Math.min(r.day,28)).padStart(2,'0');
+  const entry={id:String(Date.now()),amt:r.amt,cat:r.cat,src:r.src,note:r.name,date:dateStr,tags:''};
+  const ok=await addToSheet(entry);
+  if(ok){renderAll();showToast(`✓ Added ${r.name}`);}
+}
+function renderRecurring(){
+  const list=document.getElementById('recurringList');
+  const due=document.getElementById('recurringDue');
+  if(!list)return;
+  const today=new Date();
+  const thisMonth=getCurrentMonth();
+  if(!recurring.length){
+    list.innerHTML='';
+    if(due)due.innerHTML=`<div style="font-size:.72rem;color:var(--muted)">No recurring entries set up.</div>`;
+    return;
+  }
+  list.innerHTML=`<div class="chart-card"><div class="chart-card-title">All Recurring (${recurring.length})</div>`+
+    recurring.map(r=>`
+    <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)">
+      <div style="width:36px;height:36px;border-radius:10px;background:${CAT_COLORS[r.cat]||'#888'}22;color:${CAT_COLORS[r.cat]||'#888'};display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">${CAT_ICONS[r.cat]||'📦'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:.8rem">${r.name}</div>
+        <div style="font-size:.63rem;color:var(--muted)">Day ${r.day} · ${r.src}</div>
+      </div>
+      <div style="font-family:'Clash Display',sans-serif;font-size:.9rem;font-weight:700">${fmtFull(r.amt)}</div>
+      <button onclick="deleteRecurring('${r.id}')" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.2rem .5rem;font-size:.62rem;cursor:pointer">✕</button>
+    </div>`).join('')+'</div>';
+  // Due this month - check which haven't been added yet
+  if(due){
+    const monthEntries=expenses.filter(e=>e.date.startsWith(thisMonth));
+    const dueItems=recurring.filter(r=>{
+      const alreadyAdded=monthEntries.some(e=>e.note===r.name&&e.amt===r.amt&&e.cat===r.cat);
+      return !alreadyAdded;
+    });
+    if(!dueItems.length){
+      due.innerHTML=`<div style="font-size:.72rem;color:var(--green);font-weight:600">✓ All recurring entries logged this month</div>`;
+    } else {
+      due.innerHTML=dueItems.map(r=>`
+        <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)">
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:.78rem">${r.name}</div>
+            <div style="font-size:.62rem;color:var(--muted)">Due day ${r.day}</div>
+          </div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:.88rem;font-weight:700">${fmtFull(r.amt)}</div>
+          <button onclick="applyRecurring(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="background:var(--gold);color:white;border:none;border-radius:8px;padding:.35rem .75rem;font-size:.68rem;font-weight:700;cursor:pointer">+ Add</button>
+        </div>`).join('');
+    }
+  }
+}
+
+// ── INCOME ──
+async function fetchIncome(){
+  if(!scriptUrl)return;
+  const res=await sheetCall({action:'getIncome'});
+  if(res&&res.income) income=res.income.map(e=>({...e,amt:parseFloat(e.amt)||0}));
+}
+async function addIncomeEntry(){
+  const amt=parseFloat(document.getElementById('incAmt').value);
+  const date=toISODate(document.getElementById('incDate').value);
+  const src=document.getElementById('incSrc').value;
+  if(!amt||!date){showToast('Fill amount and date','warn');return;}
+  const entry={id:String(Date.now()),date,src,amt};
+  income.unshift(entry);
+  renderIncome();
+  if(scriptUrl) sheetCall({action:'addIncome',id:entry.id,date:entry.date,src:entry.src,amt:entry.amt});
+  document.getElementById('incAmt').value='';
+  showToast(`✓ ₹${amt.toLocaleString('en-IN')} logged`);
+}
+async function deleteIncomeEntry(id){
+  income=income.filter(e=>e.id!==id);
+  renderIncome();
+  if(scriptUrl) sheetCall({action:'delIncome',id});
+  showToast('✓ Removed');
+}
+function renderIncome(){
+  const el=document.getElementById('incomeList');
+  const totalEl=document.getElementById('incomeTotal');
+  if(!el)return;
+  const thisMonth=getCurrentMonth();
+  const monthIncome=income.filter(e=>e.date&&e.date.startsWith(thisMonth));
+  const total=monthIncome.reduce((s,e)=>s+e.amt,0);
+  if(totalEl) totalEl.textContent=fmt(total);
+  if(!income.length){el.innerHTML=`<div class="chart-card"><div style="font-size:.72rem;color:var(--muted)">No income logged yet.</div></div>`;return;}
+  const byMonth={};
+  income.forEach(e=>{const m=e.date?e.date.slice(0,7):'unknown';(byMonth[m]=byMonth[m]||[]).push(e)});
+  el.innerHTML=Object.keys(byMonth).sort().reverse().map(m=>{
+    const[y,mo]=m.split('-');
+    const mName=new Date(y,mo-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+    const mTotal=byMonth[m].reduce((s,e)=>s+e.amt,0);
+    return `<div class="chart-card" style="margin-bottom:.5rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+        <div class="chart-card-title" style="margin-bottom:0">${mName}</div>
+        <div style="font-family:'Clash Display',sans-serif;font-weight:700;color:var(--green)">${fmt(mTotal)}</div>
+      </div>`+
+      byMonth[m].map(e=>`
+        <div style="display:flex;align-items:center;gap:.75rem;padding:.5rem 0;border-top:1px solid var(--border)">
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:.78rem">${e.src}</div>
+            <div style="font-size:.62rem;color:var(--muted)">${fmtDate(e.date)}</div>
+          </div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:.9rem;font-weight:700;color:var(--green)">+${fmtFull(e.amt)}</div>
+          <button onclick="deleteIncomeEntry('${e.id}')" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.2rem .5rem;font-size:.62rem;cursor:pointer">✕</button>
+        </div>`).join('')+'</div>';
+  }).join('');
+}
+
+// ── EMI TRACKER ──
+async function fetchEmis(){
+  if(!scriptUrl)return;
+  const res=await sheetCall({action:'getEmis'});
+  if(res&&res.emis) emis=res.emis;
+}
+async function addEmiEntry(){
+  const name=document.getElementById('emiName').value.trim();
+  const principal=parseFloat(document.getElementById('emiPrincipal').value);
+  const emi=parseFloat(document.getElementById('emiAmt').value);
+  const totalMonths=parseInt(document.getElementById('emiMonths').value);
+  const startDate=toISODate(document.getElementById('emiStart').value);
+  const rate=parseFloat(document.getElementById('emiRate').value)||0;
+  if(!name||!principal||!emi||!totalMonths||!startDate){showToast('Fill all fields','warn');return;}
+  const entry={id:String(Date.now()),name,principal,emi,startDate,totalMonths,rate};
+  emis.push(entry);
+  renderEmis();
+  if(scriptUrl) sheetCall({action:'saveEmi',id:entry.id,name:entry.name,principal:entry.principal,emi:entry.emi,startDate:entry.startDate,totalMonths:entry.totalMonths,rate:entry.rate});
+  document.getElementById('emiName').value='';
+  showToast('✓ EMI added');
+}
+async function deleteEmiEntry(id){
+  emis=emis.filter(e=>e.id!==id);
+  renderEmis();
+  if(scriptUrl) sheetCall({action:'delEmi',id});
+}
+function renderEmis(){
+  const el=document.getElementById('emiList');if(!el)return;
+  if(!emis.length){el.innerHTML=`<div class="chart-card"><div style="font-size:.72rem;color:var(--muted)">No EMIs added yet.</div></div>`;return;}
+  const now=new Date();
+  el.innerHTML=emis.map(e=>{
+    const start=new Date(e.startDate+'T00:00:00');
+    const monthsElapsed=Math.max(0,(now.getFullYear()-start.getFullYear())*12+(now.getMonth()-start.getMonth()));
+    const monthsLeft=Math.max(0,e.totalMonths-monthsElapsed);
+    const paidAmt=monthsElapsed*e.emi;
+    const remaining=Math.max(0,e.principal-(paidAmt*(e.principal/(e.totalMonths*e.emi||1))));
+    const pct=Math.min(100,Math.round(monthsElapsed/e.totalMonths*100));
+    const endDate=new Date(start);endDate.setMonth(endDate.getMonth()+e.totalMonths);
+    return `<div class="chart-card" style="margin-bottom:.5rem">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem">
+        <div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:700">${e.name}</div>
+          <div style="font-size:.62rem;color:var(--muted);margin-top:.15rem">${e.rate}% · Ends ${endDate.toLocaleDateString('en-IN',{month:'short',year:'numeric'})}</div>
+        </div>
+        <button onclick="deleteEmiEntry('${e.id}')" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.2rem .5rem;font-size:.62rem;cursor:pointer">✕</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.75rem">
+        <div style="background:var(--card2);border-radius:10px;padding:.6rem;text-align:center">
+          <div style="font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Monthly EMI</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:.9rem;font-weight:700">${fmt(e.emi)}</div>
+        </div>
+        <div style="background:var(--card2);border-radius:10px;padding:.6rem;text-align:center">
+          <div style="font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Months Left</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:.9rem;font-weight:700;color:${monthsLeft<=3?'var(--green)':monthsLeft<=6?'var(--gold)':'var(--red)'}">${monthsLeft}</div>
+        </div>
+        <div style="background:var(--card2);border-radius:10px;padding:.6rem;text-align:center">
+          <div style="font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem">Outstanding</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:.9rem;font-weight:700">${fmt(e.principal*(monthsLeft/e.totalMonths))}</div>
+        </div>
+      </div>
+      <div style="height:6px;background:var(--card2);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:var(--green);border-radius:3px;transition:width 1s"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:.35rem">
+        <div style="font-size:.6rem;color:var(--muted)">${pct}% paid</div>
+        <div style="font-size:.6rem;color:var(--muted)">${monthsElapsed}/${e.totalMonths} months</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── INSIGHTS ──
+function renderInsights(){
+  const el=document.getElementById('insightsContent');if(!el)return;
+  const thisMonth=getCurrentMonth();
+  const months=getMonths();
+  const prevMonth=months[1]||null;
+
+  const mExp=expenses.filter(e=>e.date.startsWith(thisMonth));
+  const pExp=prevMonth?expenses.filter(e=>e.date.startsWith(prevMonth)):[];
+
+  const mSpend=mExp.filter(e=>e.cat!=='Investment').reduce((s,e)=>s+e.amt,0);
+  const pSpend=pExp.filter(e=>e.cat!=='Investment').reduce((s,e)=>s+e.amt,0);
+
+  // Spending forecast
+  const today=new Date();
+  const daysInMonth=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
+  const daysPassed=today.getDate();
+  const forecast=daysPassed>0?Math.round(mSpend/daysPassed*daysInMonth):0;
+  const forecastPct=Math.round(forecast/INCOME*100);
+
+  // Month-over-month
+  const momDiff=mSpend-pSpend;
+  const momPct=pSpend?Math.round(Math.abs(momDiff)/pSpend*100):0;
+
+  // Category trends (this vs prev month)
+  const catTrends=CATS.filter(c=>c!=='Investment').map(cat=>{
+    const curr=mExp.filter(e=>e.cat===cat).reduce((s,e)=>s+e.amt,0);
+    const prev=pExp.filter(e=>e.cat===cat).reduce((s,e)=>s+e.amt,0);
+    const diff=curr-prev;
+    return{cat,curr,prev,diff,pct:prev?Math.round(Math.abs(diff)/prev*100):0};
+  }).filter(c=>c.curr>0||c.prev>0).sort((a,b)=>b.curr-a.curr);
+
+  // Unusual spends (> 2x category monthly avg)
+  const allMonths=months.slice(0,6);
+  const unusualSpends=mExp.filter(e=>{
+    if(e.cat==='Investment')return false;
+    const catAvg=allMonths.reduce((s,m)=>s+expenses.filter(x=>x.date.startsWith(m)&&x.cat===e.cat).reduce((a,x)=>a+x.amt,0),0)/(allMonths.length||1);
+    const singleAvg=catAvg/Math.max(1,expenses.filter(x=>x.cat===e.cat).length/Math.max(1,allMonths.length));
+    return singleAvg>0&&e.amt>singleAvg*2.5;
+  });
+
+  // Weekly summary
+  const weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);
+  const weekStr=weekAgo.toISOString().split('T')[0];
+  const weekExp=expenses.filter(e=>e.date>=weekStr&&e.cat!=='Investment');
+  const weekTotal=weekExp.reduce((s,e)=>s+e.amt,0);
+
+  // Tags summary
+  const allTags={};
+  expenses.filter(e=>e.tags&&e.date.startsWith(thisMonth)).forEach(e=>{
+    e.tags.split(',').map(t=>t.trim()).filter(Boolean).forEach(t=>{
+      allTags[t]=(allTags[t]||0)+e.amt;
+    });
+  });
+
+  el.innerHTML=`
+    <!-- Weekly summary -->
+    <div class="chart-card" style="margin-top:.75rem">
+      <div class="chart-card-title">📅 Last 7 Days</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:1.4rem;font-weight:700">${fmt(weekTotal)}</div>
+          <div style="font-size:.65rem;color:var(--muted);margin-top:.2rem">${weekExp.length} transactions</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:.65rem;color:var(--muted)">Daily avg</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:1rem;font-weight:700">${fmt(Math.round(weekTotal/7))}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MoM comparison -->
+    <div class="chart-card">
+      <div class="chart-card-title">📊 Month-over-Month</div>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div style="flex:1;background:var(--card2);border-radius:12px;padding:.75rem;text-align:center">
+          <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;margin-bottom:.3rem">This Month</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:1.1rem;font-weight:700">${fmt(mSpend)}</div>
+        </div>
+        <div style="font-size:1.2rem;color:${momDiff>0?'var(--red)':'var(--green)'}">${momDiff>0?'↑':'↓'}</div>
+        <div style="flex:1;background:var(--card2);border-radius:12px;padding:.75rem;text-align:center">
+          <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;margin-bottom:.3rem">Last Month</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:1.1rem;font-weight:700">${fmt(pSpend)}</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:.6rem;font-size:.72rem;font-weight:700;color:${momDiff>0?'var(--red)':'var(--green)'}">
+        ${momDiff>0?'+':''}${fmt(Math.abs(momDiff))} (${momPct}%) ${momDiff>0?'more than':'less than'} last month
+      </div>
+    </div>
+
+    <!-- Spending forecast -->
+    <div class="chart-card">
+      <div class="chart-card-title">🔮 Month-End Forecast</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:.75rem">
+        <div>
+          <div style="font-size:.62rem;color:var(--muted)">At current pace</div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:1.4rem;font-weight:700;color:${forecast>INCOME*0.5?'var(--red)':'var(--text)'}">${fmt(forecast)}</div>
+        </div>
+        <div style="text-align:right;font-size:.68rem;color:var(--muted)">${daysPassed}/${daysInMonth} days done</div>
+      </div>
+      <div style="height:8px;background:var(--card2);border-radius:4px;overflow:hidden;margin-bottom:.35rem">
+        <div style="height:100%;width:${Math.min(100,forecastPct)}%;background:${forecastPct>80?'var(--red)':forecastPct>60?'var(--gold)':'var(--green)'};border-radius:4px;transition:width 1s"></div>
+      </div>
+      <div style="font-size:.62rem;color:var(--muted)">${forecastPct}% of ₹2.5L income · ${fmt(Math.max(0,INCOME-forecast))} projected remaining</div>
+    </div>
+
+    <!-- Category trends -->
+    <div class="chart-card">
+      <div class="chart-card-title">📈 Category Trends vs Last Month</div>
+      ${catTrends.slice(0,8).map(c=>`
+        <div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:.9rem;width:20px">${CAT_ICONS[c.cat]||'📦'}</span>
+          <span style="font-size:.72rem;font-weight:600;flex:1">${c.cat}</span>
+          <span style="font-size:.72rem;font-weight:700">${fmt(c.curr)}</span>
+          ${c.prev>0?`<span style="font-size:.65rem;font-weight:700;color:${c.diff>0?'var(--red)':'var(--green)'};min-width:50px;text-align:right">${c.diff>0?'↑+':'↓'}${fmt(Math.abs(c.diff))}</span>`:'<span style="font-size:.6rem;color:var(--muted);min-width:50px;text-align:right">new</span>'}
+        </div>`).join('')}
+    </div>
+
+    <!-- Unusual spends -->
+    ${unusualSpends.length?`<div class="chart-card">
+      <div class="chart-card-title">⚠️ Unusual Spends This Month</div>
+      ${unusualSpends.map(e=>`
+        <div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:.9rem">${CAT_ICONS[e.cat]||'📦'}</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.72rem;font-weight:600">${e.cat} ${e.note?'· '+e.note:''}</div>
+            <div style="font-size:.6rem;color:var(--muted)">${fmtDate(e.date)}</div>
+          </div>
+          <div style="font-family:'Clash Display',sans-serif;font-size:.88rem;font-weight:700;color:var(--red)">${fmtFull(e.amt)}</div>
+        </div>`).join('')}
+    </div>`:''}
+
+    <!-- Tags -->
+    ${Object.keys(allTags).length?`<div class="chart-card">
+      <div class="chart-card-title">🏷 Tags This Month</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.25rem">
+        ${Object.entries(allTags).map(([t,v])=>`
+          <div style="background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:.3rem .75rem;font-size:.68rem;font-weight:600">
+            ${t} · ${fmt(v)}
+          </div>`).join('')}
+      </div>
+    </div>`:''}
+  `;
+}
+
+function copyMonthReport(){
+  const thisMonth=getCurrentMonth();
+  const[y,mo]=thisMonth.split('-');
+  const mName=new Date(y,mo-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+  const mExp=expenses.filter(e=>e.date.startsWith(thisMonth));
+  const spend=mExp.filter(e=>e.cat!=='Investment').reduce((s,e)=>s+e.amt,0);
+  const invest=mExp.filter(e=>e.cat==='Investment').reduce((s,e)=>s+e.amt,0);
+  const cc=mExp.filter(e=>CC_SOURCES.includes(e.src)&&e.cat!=='Investment').reduce((s,e)=>s+e.amt,0);
+  const catBreakdown=CATS.filter(c=>c!=='Investment').map(cat=>{
+    const amt=mExp.filter(e=>e.cat===cat).reduce((s,e)=>s+e.amt,0);
+    return amt>0?`  ${CAT_ICONS[cat]||'•'} ${cat}: ${fmtFull(amt)}`:'';
+  }).filter(Boolean).join('\n');
+  const report=`📊 ${mName} — Expense Report
+${'─'.repeat(32)}
+💸 Total Spent: ${fmtFull(spend)}
+📈 Invested: ${fmtFull(invest)}
+💳 CC Swipe: ${fmtFull(cc)}
+💰 Remaining: ${fmtFull(Math.max(0,INCOME-spend-invest))}
+
+Category Breakdown:
+${catBreakdown}
+${'─'.repeat(32)}
+Generated by Finlo`;
+  navigator.clipboard.writeText(report).then(()=>showToast('✓ Report copied!')).catch(()=>showToast('Could not copy','err'));
+}
+
+// ── TAGS — update addExpense and saveEdit to include tags ──
+
+// ── UPDATE showPage to render new pages ──
+const _origShowPage=showPage;
+showPage=function(id,el){
+  _origShowPage(id,el);
+  if(id==='insightsPage') renderInsights();
+  if(id==='recurringPage'){renderRecurring();renderCatDropdowns();}
+  if(id==='incomePage') renderIncome();
+  if(id==='emiPage') renderEmis();
+};
+
+// ── INIT
 document.getElementById('dateInput').value=new Date().toISOString().split('T')[0];
 applyTheme(localStorage.getItem('theme')||'light');
 renderCatDropdowns();
 renderCatPills();
 hideLoading();
 (async()=>{
-  await Promise.all([fetchFromSheet(),fetchBudgets()]);
+  await Promise.all([fetchFromSheet(),fetchBudgets(),fetchRecurring(),fetchIncome(),fetchEmis()]);
   activeMonth=getMonths()[0];
   sumMonth=getMonths()[0];
   renderAll();
+  // Check for due recurring entries
+  const thisMonth=getCurrentMonth();
+  const due=recurring.filter(r=>!expenses.some(e=>e.date.startsWith(thisMonth)&&e.note===r.name&&e.amt===r.amt));
+  if(due.length) showToast(`${due.length} recurring entries due this month`,'warn');
 })();
 </script>
 </body>
