@@ -1614,6 +1614,16 @@ function renderSummary(){
   const[y,mo]=sumMonth.split('-');
   const mName=new Date(y,mo-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
 
+  // Compute avg monthly spend across ALL data
+  const allMonths = getMonths().filter(m => {
+    const mData = expenses.filter(e=>e.date.startsWith(m));
+    return mData.some(e=>e.cat!=='Investment');
+  });
+  const allSpend = allMonths.reduce((s,m)=>s+expenses.filter(e=>e.date.startsWith(m)&&e.cat!=='Investment').reduce((a,e)=>a+e.amt,0),0);
+  const avgMonthly = allMonths.length ? Math.round(allSpend/allMonths.length) : 0;
+  const allInvest = allMonths.reduce((s,m)=>s+expenses.filter(e=>e.date.startsWith(m)&&e.cat==='Investment').reduce((a,e)=>a+e.amt,0),0);
+  const avgInvest = allMonths.length ? Math.round(allInvest/allMonths.length) : 0;
+
   document.getElementById('statGrid').innerHTML=`
     <div class="stat-card accent-gold">
       <div class="lbl">Total Spent</div>
@@ -1634,6 +1644,27 @@ function renderSummary(){
       <div class="lbl">Remaining</div>
       <div class="val" style="color:var(--green)">${fmt(Math.max(0,INCOME-spend-invest))}</div>
       <div class="sub">of ₹2.5L income</div>
+    </div>
+    <div class="stat-card" style="grid-column:1/-1">
+      <div class="lbl">Avg Monthly Spend · ${allMonths.length} months of data</div>
+      <div style="display:flex;gap:2rem;align-items:flex-end;flex-wrap:wrap;margin-top:.25rem">
+        <div>
+          <div class="val" style="color:var(--red)">${fmt(avgMonthly)}</div>
+          <div class="sub">avg spend / month</div>
+        </div>
+        <div>
+          <div class="val" style="color:var(--green)">${fmt(avgInvest)}</div>
+          <div class="sub">avg invested / month</div>
+        </div>
+        <div>
+          <div class="val">${fmt(avgMonthly+avgInvest)}</div>
+          <div class="sub">avg total outflow / month</div>
+        </div>
+        <div>
+          <div class="val" style="color:var(--gold)">${fmt(Math.max(0,INCOME-avgMonthly-avgInvest))}</div>
+          <div class="sub">avg remaining / month</div>
+        </div>
+      </div>
     </div>`;
 
   const catT=CATS.filter(c=>c!=='Investment')
