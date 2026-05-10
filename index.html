@@ -773,8 +773,8 @@ select.field-ctrl option{background:var(--card)}
   <button class="nav-item" data-page="insightsPage" onclick="showPage('insightsPage',this)">
     <span class="nav-icon">💡</span><span class="nav-label">Insights</span>
   </button>
-  <button class="nav-item" id="moreNavBtn" onclick="openMore()">
-    <span class="nav-icon">⋯</span><span class="nav-label">More</span>
+  <button class="nav-item" id="moreNavBtn" onclick="openMore()" style="background:none;border:none;cursor:pointer">
+    <span class="nav-icon">⋯</span><span class="nav-label" style="color:var(--muted)">More</span>
   </button>
 </nav>
 
@@ -1603,9 +1603,26 @@ function openMore(){ document.getElementById('moreOverlay').classList.add('open'
 function closeMore(){ document.getElementById('moreOverlay').classList.remove('open'); }
 function goPage(id){
   closeMore();
-  // find or create a dummy el for nav highlight
-  const el = document.querySelector(`[data-page="${id}"]`) || document.getElementById('moreNavBtn');
-  showPage(id, el);
+  // Clear all nav active states first
+  document.querySelectorAll('.nav-item,.ds-tab').forEach(t=>t.classList.remove('active'));
+  // Find matching nav item if exists
+  const el=document.querySelector(`[data-page="${id}"]`);
+  if(el) el.classList.add('active');
+  // Show page directly without re-triggering nav
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  // Hide bottom stats if not home
+  const isHome=id==='homePage';
+  const bs=document.getElementById('bottomStats');
+  if(bs) bs.style.display=isHome?'grid':'none';
+  // Render page content
+  if(id==='summaryPage') renderSummary();
+  if(id==='budgetPage') renderBudget();
+  if(id==='setupPage') renderSetup();
+  if(id==='insightsPage') renderInsights();
+  if(id==='recurringPage'){renderRecurring();renderCatDropdowns();}
+  if(id==='incomePage') renderIncome();
+  if(id==='emiPage') renderEmis();
 }
 function closeEditSheet(){ document.getElementById('editOverlay').classList.remove('open'); editingId=null; }
 function closeModal(){ closeEditSheet(); }
