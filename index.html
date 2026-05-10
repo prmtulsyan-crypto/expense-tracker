@@ -857,43 +857,68 @@ async function fetchFromSheet(){
 
 async function addToSheet(entry){
   if(!scriptUrl){showToast('Not connected to Google Sheets','err');return false;}
-  setSyncStatus('loading','Saving…');
-  const res=await sheetCall({action:'add',id:entry.id,date:entry.date,cat:entry.cat,src:entry.src,amt:entry.amt,note:entry.note||''});
-  if(res&&res.success){
-    expenses.unshift(entry);
-    setSyncStatus('ok',`Synced · ${expenses.length} entries`);
-    return true;
-  }
-  setSyncStatus('err','Save failed');
-  showToast('Save failed – check connection','err');
-  return false;
+  // Optimistic update - add to UI instantly
+  expenses.unshift(entry);
+  setSyncStatus('loading','Syncing…');
+  // Sync in background
+  sheetCall({action:'add',id:entry.id,date:entry.date,cat:entry.cat,src:entry.src,amt:entry.amt,note:entry.note||''})
+    .then(res=>{
+      if(res&&res.success){
+        setSyncStatus('ok',`Synced · ${expenses.length} entries`);
+      } else {
+        // Rollback
+        expenses=expenses.filter(e=>e.id!==entry.id);
+        renderAll();
+        setSyncStatus('err','Save failed');
+        showToast('Save failed – rolled back','err');
+      }
+    });
+  return true;
 }
 
 async function editInSheet(entry){
   if(!scriptUrl){showToast('Not connected to Google Sheets','err');return false;}
-  setSyncStatus('loading','Updating…');
-  const res=await sheetCall({action:'edit',id:entry.id,date:entry.date,cat:entry.cat,src:entry.src,amt:entry.amt,note:entry.note||''});
-  if(res&&res.success){
-    const i=expenses.findIndex(e=>e.id===entry.id);
-    if(i>=0)expenses[i]=entry;
-    setSyncStatus('ok',`Synced · ${expenses.length} entries`);
-    return true;
-  }
-  setSyncStatus('err','Update failed');
-  return false;
+  // Optimistic update
+  const i=expenses.findIndex(e=>e.id===entry.id);
+  const prev=i>=0?{...expenses[i]}:null;
+  if(i>=0) expenses[i]=entry;
+  setSyncStatus('loading','Syncing…');
+  // Sync in background
+  sheetCall({action:'edit',id:entry.id,date:entry.date,cat:entry.cat,src:entry.src,amt:entry.amt,note:entry.note||''})
+    .then(res=>{
+      if(res&&res.success){
+        setSyncStatus('ok',`Synced · ${expenses.length} entries`);
+      } else {
+        // Rollback
+        if(prev&&i>=0) expenses[i]=prev;
+        renderAll();
+        setSyncStatus('err','Update failed');
+        showToast('Update failed – rolled back','err');
+      }
+    });
+  return true;
 }
 
 async function deleteFromSheet(id){
   if(!scriptUrl){showToast('Not connected to Google Sheets','err');return false;}
-  setSyncStatus('loading','Deleting…');
-  const res=await sheetCall({action:'del',id});
-  if(res&&res.success){
-    expenses=expenses.filter(e=>e.id!==String(id));
-    setSyncStatus('ok',`Synced · ${expenses.length} entries`);
-    return true;
-  }
-  setSyncStatus('err','Delete failed');
-  return false;
+  // Optimistic update - remove instantly
+  const removed=expenses.find(e=>e.id===String(id));
+  expenses=expenses.filter(e=>e.id!==String(id));
+  setSyncStatus('loading','Syncing…');
+  // Sync in background
+  sheetCall({action:'del',id})
+    .then(res=>{
+      if(res&&res.success){
+        setSyncStatus('ok',`Synced · ${expenses.length} entries`);
+      } else {
+        // Rollback
+        if(removed) expenses.unshift(removed);
+        renderAll();
+        setSyncStatus('err','Delete failed');
+        showToast('Delete failed – rolled back','err');
+      }
+    });
+  return true;
 }
 
 // ── PAGE NAV ──
@@ -1070,9 +1095,9 @@ async function addExpense(){
 // ── DELETE ──
 async function delEntry(id){
   if(!confirm('Delete this entry?'))return;
-  const ok=await deleteFromSheet(id);
-  if(ok){renderAll();showToast('✓ Deleted')}
-  else showToast('Delete failed','err');
+  await deleteFromSheet(id);
+  renderAll();
+  showToast('✓ Deleted');
 }
 
 // ── EDIT ──
@@ -1094,9 +1119,10 @@ async function saveEdit(){
   const date=toISODate(rawDate);
   if(!date){showToast('Invalid date','warn');return;}
   const entry={id:editingId,amt,cat:document.getElementById('editCat').value,src:document.getElementById('editSrc').value,note:document.getElementById('editNote').value.trim(),date};
+  // Close instantly, sync in background
+  closeModal();
   const ok=await editInSheet(entry);
-  if(ok){closeModal();renderAll();showToast('✓ Updated')}
-  else showToast('Update failed','err');
+  if(ok){renderAll();showToast('✓ Updated')}
 }
 // modalOverlay replaced by editOverlay (handled below)
 
@@ -1311,10 +1337,16 @@ async function fetchBudgets(){
 async function syncBudgetToSheet(cat, amt){
   budgets[cat] = amt;
   if(!scriptUrl){ showToast('Not connected','err'); return false; }
-  const res = await sheetCall({action:'saveBudgets', data: JSON.stringify(budgets)});
-  if(res && res.success) return true;
-  showToast('Budget save failed','err');
-  return false;
+  // Sync in background - budgets update instantly
+  sheetCall({action:'saveBudgets', data: JSON.stringify(budgets)})
+    .then(res=>{
+      if(res&&res.success){
+        setSyncStatus('ok','Budgets synced');
+      } else {
+        showToast('Budget sync failed','warn');
+      }
+    });
+  return true;
 }
 
 function exportCSV(){
