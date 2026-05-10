@@ -319,6 +319,9 @@ select.field-ctrl option{background:var(--card)}
 /* Loading */
 .loading-overlay{position:fixed;inset:0;background:var(--bg);z-index:150;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
 .loading-overlay.hidden{display:none}
+.more-item{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:1.1rem .75rem;display:flex;flex-direction:column;align-items:center;gap:.5rem;font-size:1.4rem;cursor:pointer;transition:all .15s;color:var(--text)}
+.more-item span{font-size:.72rem;font-weight:700;font-family:'Satoshi',sans-serif;color:var(--muted)}
+.more-item:active{transform:scale(.96);background:var(--card3)}
 .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-size:.78rem;color:var(--muted);font-weight:600;font-family:'Satoshi',sans-serif}
@@ -359,6 +362,22 @@ select.field-ctrl option{background:var(--card)}
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- MORE MENU SHEET -->
+<div class="sheet-overlay" id="moreOverlay">
+  <div class="sheet" style="padding-bottom:calc(1.5rem + var(--safe-bottom))">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">More <button class="sheet-close" onclick="closeMore()">✕</button></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+      <button class="more-item" onclick="goPage('budgetPage')">🎯<span>Budget</span></button>
+      <button class="more-item" onclick="goPage('recurringPage')">🔁<span>Recurring</span></button>
+      <button class="more-item" onclick="goPage('incomePage')">💰<span>Income</span></button>
+      <button class="more-item" onclick="goPage('emiPage')">🏦<span>EMI Tracker</span></button>
+      <button class="more-item" onclick="goPage('setupPage')">⚙️<span>Setup</span></button>
+      <button class="more-item" onclick="toggleTheme();closeMore()">🌙<span id="themeMoreLabel">Theme</span></button>
+    </div>
+  </div>
+</div>
 
 <!-- ADD SHEET -->
 <div class="sheet-overlay" id="addOverlay">
@@ -754,8 +773,8 @@ select.field-ctrl option{background:var(--card)}
   <button class="nav-item" data-page="insightsPage" onclick="showPage('insightsPage',this)">
     <span class="nav-icon">💡</span><span class="nav-label">Insights</span>
   </button>
-  <button class="nav-item" data-page="budgetPage" onclick="showPage('budgetPage',this)">
-    <span class="nav-icon">⚙️</span><span class="nav-label">More</span>
+  <button class="nav-item" id="moreNavBtn" onclick="openMore()">
+    <span class="nav-icon">⋯</span><span class="nav-label">More</span>
   </button>
 </nav>
 
@@ -1580,6 +1599,14 @@ function showPage(id, el){
 // Add/Edit sheets
 function openAddSheet(){ document.getElementById('addOverlay').classList.add('open'); document.getElementById('amtInput').focus(); }
 function closeAddSheet(){ document.getElementById('addOverlay').classList.remove('open'); }
+function openMore(){ document.getElementById('moreOverlay').classList.add('open'); }
+function closeMore(){ document.getElementById('moreOverlay').classList.remove('open'); }
+function goPage(id){
+  closeMore();
+  // find or create a dummy el for nav highlight
+  const el = document.querySelector(`[data-page="${id}"]`) || document.getElementById('moreNavBtn');
+  showPage(id, el);
+}
 function closeEditSheet(){ document.getElementById('editOverlay').classList.remove('open'); editingId=null; }
 function closeModal(){ closeEditSheet(); }
 
@@ -1622,6 +1649,7 @@ addExpense = async function(){
 
 // Overlay close on backdrop click
 document.getElementById('addOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeAddSheet()});
+document.getElementById('moreOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeMore()});
 document.getElementById('editOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeEditSheet()});
 
 // Override renderAll for new UI
